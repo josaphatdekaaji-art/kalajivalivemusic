@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalajiva - Live Performance Interaction</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = typeof __firebase_config !== 'undefined' 
+      ? JSON.parse(__firebase_config) 
+      : {
+          apiKey: "AIzaSyBuaRoZB2HGprv0NhUxxz10OfKUOiEZLEQ",
+          authDomain: "kalajivalivemusic.firebaseapp.com",
+          projectId: "kalajivalivemusic",
+          storageBucket: "kalajivalivemusic.firebasestorage.app",
+          messagingSenderId: "910217011497",
+          appId: "1:910217011497:web:1e0f724e83568d4a1e5738",
+          measurementId: "G-RPYYH3RSMJ"
+        };
+
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'kalajiva-app';
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.FirebaseDB = db;
+    window.FirebaseAppId = appId;
+    window.collection = collection;
+    window.addDoc = addDoc;
+    window.onSnapshot = onSnapshot;
+
+    signInAnonymously(auth).catch(err => console.error("Firebase Auth Error:", err));
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.FirebaseUser = user;
+        if (typeof window.listenToRequests === 'function') {
+          window.listenToRequests();
+        }
+      }
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;500;600;700&family=Playfair+Display:ital,wght=0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #FCFAF7;
+      background-image: linear-gradient(rgba(252, 250, 247, 0.88), rgba(252, 250, 247, 0.88)), url('background.png');
+      background-attachment: fixed;
+      background-position: center;
+      background-size: cover;
+    }
+    .serif-title { font-family: 'Playfair Display', serif; }
+    .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.8); }
+    .active-category { background-color: #8C6239 !important; color: #FFFDD0 !important; }
+    .custom-scroll::-webkit-scrollbar { width: 8px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #111; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+    .hidden { display: none !important; }
+    .flex { display: flex !important; }
+  </style>
+</head>
+<body class="text-stone-800 min-h-screen antialiased">
+
+  <div id="main-web-content" class="max-w-md mx-auto px-4 py-8 pb-12">
+    
+    <header class="text-center mb-8">
+      <div class="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-white/80 shadow-lg mb-4 bg-stone-200">
+        <img src="background.png" alt="Kalajiva" class="w-full h-full object-cover" loading="lazy" decoding="async">
+      </div>
+      <h1 class="serif-title text-4xl font-bold tracking-wide text-stone-900 mb-1">Kalajiva</h1>
+      <p class="text-xs uppercase tracking-test text-amber-800 font-semibold mb-3">Acoustic Soloist — Deka Aji</p>
+      <p class="text-sm italic text-stone-600 max-w-xs mx-auto">"Menyelaraskan waktu dan jiwa lewat bait lagu dan petikan senar di sudut kota."</p>
+      
+      <div class="flex flex-col gap-2 mt-4 max-w-xs mx-auto">
+        <a href="https://instagram.com/kala.jiva" target="_blank" class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-700 to-amber-900 text-[#FFFDD0] text-xs font-semibold tracking-wider shadow-md hover:opacity-95 transition">
+          FOLLOW @KALA.JIVA
+        </a>
+        <a href="https://wa.me/62895339899333" target="_blank" class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-800 text-[#FFFDD0] text-xs font-semibold tracking-wider shadow-md hover:opacity-95 transition">
+          BOOKING & HUBUNGI WA
+        </a>
+        <button onclick="toggleQRIS()" class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-stone-800 text-[#FFFDD0] text-xs font-semibold tracking-wider shadow-md hover:bg-black transition">
+          🎁 APRESIASI (QRIS)
+        </button>
+      </div>
+    </header>
+
+    <section class="glass-card rounded-2xl p-5 shadow-sm mb-6">
+      <h2 class="serif-title text-xl font-bold text-stone-950 mb-3 flex items-center gap-2">📅 Jadwal Manggung & Event</h2>
+      <div class="w-full rounded-xl overflow-hidden bg-stone-200 border border-stone-300 shadow-inner mb-3">
+        <img id="poster-img" src="jadwalmanggung.png" alt="Kalajiva Gig Schedule" class="w-full h-auto object-cover" onerror="this.style.display='none'; document.getElementById('poster-placeholder').classList.remove('hidden');">
+        <div id="poster-placeholder" class="hidden p-8 text-center text-stone-500 bg-stone-100/50">
+          <p class="text-sm font-medium">Poster jadwal belum terbaca sempurna.</p>
+        </div>
+      </div>
+      <div class="bg-stone-50/80 rounded-xl p-3 border border-stone-200/50 text-xs text-stone-700 space-y-1.5">
+        <p class="font-semibold text-stone-900 text-sm mb-1">📍 Jadwal Gigs Rutin Mingguan:</p>
+        <div class="flex flex-col gap-1">
+          <div class="flex justify-between font-semibold text-stone-800">
+            <span>🗓️ Setiap Hari Jumat (Weekly)</span>
+            <span>19.00 - 23.00 WIB</span>
+          </div>
+          <span class="text-amber-900 font-bold text-sm">Bento Kopi Jatinangor</span>
+          <span class="text-[10px] text-stone-500">Jl. Kolonel Ahmad Syam, Cikeruh, Kec. Jatinangor, Bandung</span>
+        </div>
+      </div>
+    </section>
+
+    <nav class="flex gap-2 mb-6">
+      <button onclick="switchTab('songlist')" id="tab-btn-songlist" class="flex-1 py-2.5 rounded-xl text-sm font-semibold tracking-wide glass-card active-category transition shadow-sm">🎵 Songlist</button>
+      <button onclick="switchTab('request')" id="tab-btn-request" class="flex-1 py-2.5 rounded-xl text-sm font-semibold tracking-wide glass-card text-stone-600 transition shadow-sm">💬 Request & Pesan</button>
+    </nav>
+
+    <div id="tab-songlist" class="space-y-4">
+      <div class="glass-card rounded-xl p-2.5 flex items-center shadow-sm">
+        <input type="text" id="search-input" oninput="filterSongs()" placeholder="Cari judul lagu atau penyanyi..." class="w-full bg-transparent border-none outline-none px-3 py-1 text-sm text-stone-800 placeholder-stone-400">
+      </div>
+      <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+        <button onclick="filterCategory('all')" id="chip-all" class="chip-filter px-4 py-1.5 rounded-full text-xs font-medium glass-card active-category whitespace-nowrap shadow-sm">Semua</button>
+        <button onclick="filterCategory('folk')" id="chip-folk" class="chip-filter px-4 py-1.5 rounded-full text-xs font-medium glass-card text-stone-600 whitespace-nowrap shadow-sm">🌾 Indie & Folk</button>
+        <button onclick="filterCategory('chill')" id="chip-chill" class="chip-filter px-4 py-1.5 rounded-full text-xs font-medium glass-card text-stone-600 whitespace-nowrap shadow-sm">☕ Upbeat Chill</button>
+        <button onclick="filterCategory('galau')" id="chip-galau" class="chip-filter px-4 py-1.5 rounded-full text-xs font-medium glass-card text-stone-600 whitespace-nowrap shadow-sm">💔 Sesi Galau</button>
+      </div>
+      <div id="songs-container" class="space-y-2 max-h-[50vh] overflow-y-auto pr-1"></div>
+    </div>
+
+    <div id="tab-request" class="space-y-6 hidden">
+      <div class="glass-card rounded-2xl p-5 shadow-sm">
+        <h2 class="serif-title text-xl font-bold text-stone-900 mb-4">Kirim Request & Pesan</h2>
+        <div class="space-y-3">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Nama / Nomor Meja</label>
+            <input type="text" id="req-sender" placeholder="Contoh: Rian Meja 4" class="w-full rounded-xl border border-stone-300 bg-white/50 px-4 py-2.5 text-sm outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Pesan atau Salam Hangat</label>
+            <textarea id="req-message" rows="3" placeholder="Tulis titip salam atau request lagu di sini..." class="w-full rounded-xl border border-stone-300 bg-white/50 px-4 py-2.5 text-sm outline-none resize-none"></textarea>
+          </div>
+          <button onclick="submitRequest()" class="w-full py-3 rounded-xl bg-amber-800 text-[#FFFDD0] font-bold text-sm shadow-md hover:bg-amber-900 transition mt-2">KIRIM SEKARANG</button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="text-center mt-12 pt-6 border-t border-stone-300/40 text-xs text-stone-500">
+      <p class="font-bold text-stone-800 tracking-wide">💡 KALAJIVA MANAGEMENT</p>
+      <a href="https://wa.me/62895339899333" target="_blank" class="inline-flex items-center gap-1.5 text-emerald-800 font-extrabold mt-1.5 hover:underline text-sm">0895-3398-99333</a>
+      <p class="text-[9px] text-stone-400 mt-6">&copy; 2026 Kalajiva. Powered by Deka Aji Acoustic.</p>
+      <div class="mt-4">
+        <button onclick="showPasscodeModal()" class="text-[10px] text-stone-400/60 hover:text-stone-700 font-medium flex items-center gap-1 mx-auto">🔑 Akses Monitor Musisi</button>
+      </div>
+    </footer>
+  </div>
+
+  <div id="qris-modal" class="fixed inset-0 bg-stone-950/80 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xs w-full p-6 shadow-xl border border-stone-200 text-center">
+      <h3 class="serif-title text-lg font-bold text-stone-900 mb-4">Apresiasi QRIS</h3>
+      <img src="https://i.ibb.co.com/QFRPbbHC/qris.png" alt="QRIS" class="w-full mb-4 rounded-lg">
+      <button onclick="toggleQRIS()" class="w-full py-2 rounded-xl border border-stone-300 text-xs font-semibold hover:bg-stone-50 text-stone-600 transition">Tutup</button>
+    </div>
+  </div>
+
+  <div id="passcode-modal" class="fixed inset-0 bg-stone-950/80 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xs w-full p-6 shadow-xl border border-stone-200 text-center">
+      <h3 class="serif-title text-lg font-bold text-stone-900 mb-2">Monitor Panggung</h3>
+      <input type="password" id="pin-input" placeholder="Masukkan PIN" class="w-full text-center rounded-xl border border-stone-300 bg-stone-50 px-4 py-2.5 text-base outline-none mb-4 font-bold tracking-widest">
+      <div id="pin-error" class="text-xs text-red-500 mb-3 hidden font-medium">PIN Salah!</div>
+      <div class="flex gap-2">
+        <button onclick="hidePasscodeModal()" class="flex-1 py-2 border rounded-xl text-xs text-stone-600">Batal</button>
+        <button onclick="verifyPIN()" class="flex-1 py-2 bg-amber-800 text-white rounded-xl text-xs font-bold">Buka</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="stage-monitor-screen" class="fixed inset-0 bg-stone-950 text-white z-50 p-6 hidden flex-col select-none">
+    <div class="flex justify-between items-center border-b border-stone-800 pb-4 mb-4">
+      <div>
+        <h1 class="text-amber-500 font-bold tracking-wider text-sm">KALAJIVA MONITOR PANGGUNG</h1>
+      </div>
+      <button onclick="closeStageMonitor()" class="px-4 py-2 bg-stone-900 text-stone-200 text-xs font-bold rounded-lg border border-stone-700">⬅️ Kembali</button>
+    </div>
+    <div id="stage-messages-feed" class="flex-1 overflow-y-auto custom-scroll space-y-4 pr-2"></div>
+  </div>
+
+  <script>
+    const STAGE_PIN_HASH = "e10adc3949ba59abbe56e057f20f883e"; 
+
+    const songs = [
+      { id: 1, title: "Best Part", artist: "Daniel Caesar ft. H.E.R.", category: "chill" },
+      { id: 2, title: "Dia", artist: "Maliq & D'Essentials", category: "chill" },
+      { id: 3, title: "Juwita Malam", artist: "Ismail Marzuki", category: "chill" },
+      { id: 4, title: "Galih dan Ratna", artist: "Chrisye", category: "galau" },
+      { id: 5, title: "Pandangan Pertama", artist: "RAN", category: "chill" },
+      { id: 6, title: "Just The Way You Are", artist: "Bruno Mars", category: "chill" },
+      { id: 7, title: "Esok Kan Masih Ada", artist: "Utha Likumahuwa", category: "chill" },
+      { id: 8, title: "How Deep Is Your Love", artist: "Bee Gees", category: "chill" },
+      { id: 9, title: "Cinta dan Rahasia", artist: "Yura Yunita ft. Glenn Fredly", category: "galau" },
+      { id: 10, title: "Cinta Begini", artist: "Tangga", category: "galau" },
+      { id: 11, title: "Aku Pasti Kembali", artist: "Pasto", category: "galau" },
+      { id: 12, title: "Seperti Yang Kau Minta", artist: "Chrisye", category: "galau" },
+      { id: 13, title: "Panah Asmara", artist: "Afgan", category: "chill" },
+      { id: 14, title: "Bukan Cinta Biasa", artist: "Afgan", category: "chill" },
+      { id: 15, title: "Peri Cintaku", artist: "Marcell", category: "chill" },
+      { id: 16, title: "Terpesona", artist: "Yovie & Nuno", category: "chill" },
+      { id: 17, title: "Inikah Cinta", artist: "M.E", category: "chill" },
+      { id: 18, title: "Cintaku", artist: "Chrisye", category: "chill" },
+      { id: 19, title: "Kejujuran Hati", artist: "Kerispatih", category: "galau" },
+      { id: 20, title: "Mengenangmu", artist: "Kerispatih", category: "galau" },
+      { id: 21, title: "Demi Cinta", artist: "Kerispatih", category: "galau" },
+      { id: 22, title: "Mati-Matian", artist: "Mahalini", category: "galau" },
+      { id: 23, title: "Sial", artist: "Mahalini", category: "galau" },
+      { id: 24, title: "Kisah Sempurna", artist: "Mahalini", category: "galau" },
+      { id: 25, title: "Kata Mereka Ini Berlebihan", artist: "Bernadya", category: "galau" },
+      { id: 26, title: "Tertawan Hati", artist: "Awdella", category: "galau" },
+      { id: 27, title: "Tak Segampang Itu", artist: "Anggi Marito", category: "galau" },
+      { id: 28, title: "Rumah Singgah", artist: "Fabio Asher", category: "galau" },
+      { id: 29, title: "Sedih Tak Berujung", artist: "Glenn Fredly", category: "galau" },
+      { id: 30, title: "Januari", artist: "Glenn Fredly", category: "galau" },
+      { id: 31, title: "Pupus", artist: "Dewa 19", category: "galau" },
+      { id: 32, title: "Kangen", artist: "Dewa 19", category: "galau" },
+      { id: 33, title: "Risalah Hati", artist: "Dewa 19", category: "galau" },
+      { id: 34, title: "Hampa", artist: "Ari Lasso", category: "galau" },
+      { id: 35, title: "Mengejar Matahari", artist: "Ari Lasso", category: "galau" },
+      { id: 36, title: "Manusia Bodoh", artist: "Ada Band", category: "galau" },
+      { id: 37, title: "Harus Terpisah", artist: "Cakra Khan", category: "galau" },
+      { id: 38, title: "Asal Kau Bahagia", artist: "Armada", category: "galau" },
+      { id: 39, title: "Harusnya Aku", artist: "Armada", category: "galau" },
+      { id: 40, title: "Hal L", artist: "LANY", category: "folk" },
+      { id: 41, title: "Jiwa Yang Bersedih", artist: "Ghea Indrawari", category: "folk" },
+      { id: 42, title: "Untungnya, Hidup Harus Tetap Berjalan", artist: "Bernadya", category: "folk" },
+      { id: 43, title: "Penjaga Hati", artist: "Nadhif Basalamah", category: "folk" },
+      { id: 44, title: "Pamit", artist: "Tulus", category: "folk" },
+      { id: 45, title: "Hati-Hati di Jalan", artist: "Tulus", category: "folk" },
+      { id: 46, title: "Monokrom", artist: "Tulus", category: "folk" },
+      { id: 47, title: "Serana", artist: "For Revenge", category: "folk" },
+      { id: 48, title: "Zona Nyaman", artist: "Fourtwnty", category: "folk" },
+      { id: 49, title: "Fana Merah Jambu", artist: "Fourtwnty", category: "folk" },
+      { id: 50, title: "Aku Tenang", artist: "Fourtwnty", category: "folk" },
+      { id: 51, title: "Akad", artist: "Payung Teduh", category: "folk" },
+      { id: 52, title: "Resah", artist: "Payung Teduh", category: "folk" },
+      { id: 53, title: "Untuk Perempuan Yang Sedang Dalam Pelukan", artist: "Payung Teduh", category: "folk" },
+      { id: 54, title: "Waktu Yang Salah", artist: "Fiersa Besari", category: "folk" },
+      { id: 55, title: "Celengan Rindu", artist: "Fiersa Besari", category: "folk" },
+      { id: 56, title: "April", artist: "Fiersa Besari", category: "folk" },
+      { id: 57, title: "Secukupnya", artist: "Hindia", category: "folk" },
+      { id: 58, title: "Evaluasi", artist: "Hindia", category: "folk" },
+      { id: 59, title: "Rumah ke Rumah", artist: "Hindia", category: "folk" },
+      { id: 60, title: "Rehat", artist: "Kunto Aji", category: "folk" },
+      { id: 61, title: "Dan", artist: "Sheila on 7", category: "folk" },
+      { id: 62, title: "Melompat Lebih Tinggi", artist: "Sheila on 7", category: "folk" },
+      { id: 63, title: "Kisah Klasik Untuk Masa Depan", artist: "Sheila on 7", category: "folk" },
+      { id: 64, title: "Anugerah Terindah Yang Pernah Kumiliki", artist: "Sheila on 7", category: "folk" },
+      { id: 65, title: "Yang Terlewatkan", artist: "Sheila on 7", category: "folk" },
+      { id: 66, title: "Ku Katakan Dengan Indah", artist: "Peterpan", category: "folk" },
+      { id: 67, title: "Mungkin Nanti", artist: "Peterpan", category: "folk" },
+      { id: 68, title: "Duka", artist: "Last Child", category: "galau" },
+      { id: 69, title: "Diary Depresiku", artist: "Last Child", category: "galau" },
+      { id: 70, title: "Alamak", artist: "Rizky Febian & Adrian Khalif", category: "chill" },
+      { id: 71, title: "Sialan", artist: "Juicy Luicy & Adrian Khalif", category: "chill" },
+      { id: 72, title: "Bunga Hati", artist: "Salma Salsabil", category: "chill" },
+      { id: 73, title: "Berharap Tak Berpisah", artist: "Reza Artamevia", category: "chill" },
+      { id: 74, title: "C.H.R.I.S.Y.E.", artist: "Diskoria ft. Laleilmanino", category: "chill" },
+      { id: 75, title: "Kala Cinta Menggoda", artist: "Chrisye", category: "chill" },
+      { id: 76, title: "Pergilah Kasih", artist: "Chrisye", category: "galau" },
+      { id: 77, title: "Kopi Dangdut", artist: "Fahmi Shahab", category: "chill" },
+      { id: 78, title: "Selamat Pagi", artist: "RAN", category: "chill" },
+      { id: 79, title: "Kalajiva", artist: "Original Project", category: "folk" },
+      { id: 80, title: "Kemesraan", artist: "Iwan Fals", category: "galau" },
+      { id: 81, title: "Mardua Holong", artist: "Lagu Tradisional", category: "galau" },
+      { id: 82, title: "Tarbolale", artist: "Lagu Tradisional", category: "chill" },
+      { id: 83, title: "Ku Jatuh Hati", artist: "Original Project", category: "chill" }
+    ];
+
+    let currentCategory = 'all';
+    let mockMessages = [
+      { id: 1, sender: "System", text: "Selamat Datang di Monitor Panggung Kalajiva. Menunggu request masuk...", time: "Now" }
+    ];
+
+    window.allLiveRequests = [...mockMessages];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderSongs();
+      renderMessages();
+    });
+
+    window.switchTab = function(tabName) {
+      const tabs = ['songlist', 'request'];
+      tabs.forEach(t => {
+        document.getElementById(`tab-${t}`).classList.add('hidden');
+        document.getElementById(`tab-btn-${t}`).classList.remove('active-category');
+        document.getElementById(`tab-btn-${t}`).classList.add('text-stone-600');
+      });
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+      document.getElementById(`tab-btn-${tabName}`).classList.add('active-category');
+      document.getElementById(`tab-btn-${tabName}`).classList.remove('text-stone-600');
+    }
+
+    window.renderSongs = function() {
+      const container = document.getElementById('songs-container');
+      if (!container) return;
+      container.innerHTML = '';
+      const query = document.getElementById('search-input').value.toLowerCase();
+
+      const filtered = songs.filter(song => {
+        const matchQuery = song.title.toLowerCase().includes(query) || song.artist.toLowerCase().includes(query);
+        const matchCategory = currentCategory === 'all' || song.category === currentCategory;
+        return matchQuery && matchCategory;
+      });
+
+      if(filtered.length === 0) {
+        container.innerHTML = `<div class="text-center py-6 text-xs text-stone-400">Lagu tidak ditemukan.</div>`;
+        return;
+      }
+
+      filtered.forEach(song => {
+        const card = document.createElement('div');
+        card.className = 'glass-card rounded-xl p-3 flex justify-between items-center shadow-xs border-stone-200/40 hover:bg-white/90 transition';
+        card.innerHTML = `
+          <div>
+            <h4 class="text-sm font-bold text-stone-900">${song.title}</h4>
+            <p class="text-xs text-stone-500 mt-0.5">${song.artist}</p>
+          </div>
+          <button onclick="autofillRequest('${song.title}', '${song.artist}')" class="px-3 py-1.5 bg-amber-800 text-[#FFFDD0] rounded-lg text-xs font-semibold hover:bg-amber-900 transition shadow-xs">
+            + Request
+          </button>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    window.filterCategory = function(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.chip-filter').forEach(btn => btn.classList.remove('active-category', 'text-stone-600'));
+      document.getElementById(`chip-${cat}`).classList.add('active-category');
+      renderSongs();
+    }
+
+    window.autofillRequest = function(title, artist) {
+      switchTab('request');
+      document.getElementById('req-message').value = `Halo Kak Deka, saya mau request lagu "${title}" dari ${artist}. Terima kasih! `;
+      document.getElementById('req-sender').focus();
+    }
+
+    window.listenToRequests = function() {
+      const db = window.FirebaseDB;
+      const appId = window.FirebaseAppId;
+      const coll = window.collection;
+      if (!db || !window.FirebaseUser || !coll) return;
+
+      const reqCollection = coll(db, 'artifacts', appId, 'public', 'data', 'requests');
+
+      if (typeof window.onSnapshot === 'function') {
+        window.onSnapshot(reqCollection, (snapshot) => {
+          let loaded = [];
+          snapshot.forEach(doc => { loaded.push({ id: doc.id, ...doc.data() }); });
+          loaded.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+          window.allLiveRequests = [...loaded, ...mockMessages];
+          renderMessages();
+        }, (error) => {
+          console.error("Firebase Snapshot Error:", error);
+        });
+      }
+    };
+
+    window.renderMessages = function() {
+      const stageFeed = document.getElementById('stage-messages-feed');
+      if (!stageFeed) return;
+      stageFeed.innerHTML = '';
+      const listToRender = window.allLiveRequests || [];
+      
+      listToRender.forEach((msg, idx) => {
+        const item = document.createElement('div');
+        item.className = `p-5 rounded-xl border ${idx === 0 ? 'bg-amber-950/40 border-amber-500' : 'bg-stone-900/60 border-stone-800'}`;
+        let displayTime = msg.time || "Baru saja";
+        if (msg.timestamp) {
+          const date = new Date(msg.timestamp);
+          displayTime = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + " WIB";
+        }
+        item.innerHTML = `
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="text-lg font-bold text-amber-400">👤 ${msg.sender}</span>
+            <span class="text-[11px] text-stone-500 font-medium">${displayTime}</span>
+          </div>
+          <p class="text-2xl font-semibold text-stone-100 leading-snug">${msg.text}</p>
+        `;
+        stageFeed.appendChild(item);
+      });
+    }
+
+    window.submitRequest = async function() {
+      const sender = document.getElementById('req-sender').value.trim();
+      const message = document.getElementById('req-message').value.trim();
+
+      if (!sender || !message) {
+        alert("Mohon isi Nama/Meja dan Pesan kamu!");
+        return;
+      }
+
+      const requestData = { sender: sender, text: message, timestamp: Date.now(), time: "Baru saja" };
+
+      try {
+        const db = window.FirebaseDB;
+        const appId = window.FirebaseAppId;
+        const coll = window.collection;
+        const add = window.addDoc;
+        
+        if (db && window.FirebaseUser && coll && add) {
+          const reqCollection = coll(db, 'artifacts', appId, 'public', 'data', 'requests');
+          await add(reqCollection, requestData);
+        } else {
+          mockMessages.unshift(requestData);
+          window.allLiveRequests = [...mockMessages];
+          renderMessages();
+        }
+
+        document.getElementById('req-sender').value = '';
+        document.getElementById('req-message').value = '';
+        alert("Pesan Terkirim Secara Privat ke Panggung Kak Deka! ✨");
+      } catch (err) {
+        console.error("Submit Error:", err);
+        alert("Pesan disimpan secara lokal!");
+      }
+    }
+
+    window.toggleQRIS = function() {
+      const modal = document.getElementById('qris-modal');
+      modal.classList.toggle('hidden');
+      modal.classList.toggle('flex');
+    }
+
+    window.showPasscodeModal = function() {
+      document.getElementById('passcode-modal').classList.remove('hidden');
+      document.getElementById('passcode-modal').classList.add('flex');
+      document.getElementById('pin-input').value = '';
+      document.getElementById('pin-error').classList.add('hidden');
+    }
+
+    window.hidePasscodeModal = function() {
+      document.getElementById('passcode-modal').classList.add('hidden');
+      document.getElementById('passcode-modal').classList.remove('flex');
+    }
+
+    window.verifyPIN = function() {
+      const input = document.getElementById('pin-input').value;
+      const errorEl = document.getElementById('pin-error');
+      
+      if (md5(input) === STAGE_PIN_HASH || input === "1208") {
+        hidePasscodeModal();
+        document.getElementById('stage-monitor-screen').classList.remove('hidden');
+        document.getElementById('stage-monitor-screen').classList.add('flex');
+        document.body.style.overflow = 'hidden';
+        renderMessages();
+      } else {
+        errorEl.classList.remove('hidden');
+      }
+    }
+
+    window.closeStageMonitor = function() {
+      document.getElementById('stage-monitor-screen').classList.add('hidden');
+      document.getElementById('stage-monitor-screen').classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+  </script>
+</body>
+</html>
