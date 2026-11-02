@@ -77,7 +77,7 @@
     
     <header class="text-center mb-8">
       <div class="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-white/80 shadow-lg mb-4 bg-stone-200">
-        <img src="background.png" alt="Kalajiva" class="w-full h-full object-cover" loading="lazy" decoding="async">
+        <img src="https://josaphatdekaaji-art.github.io/kalajivalivemusic/background.png" alt="Kalajiva" class="w-full h-full object-cover" loading="lazy" decoding="async">
       </div>
       <h1 class="serif-title text-4xl font-bold tracking-wide text-stone-900 mb-1">Kalajiva</h1>
       <p class="text-xs uppercase tracking-test text-amber-800 font-semibold mb-3">Acoustic Soloist — Deka Aji</p>
@@ -99,14 +99,16 @@
     <section class="glass-card rounded-2xl p-5 shadow-sm mb-6">
       <h2 class="serif-title text-xl font-bold text-stone-950 mb-3 flex items-center gap-2">📅 Jadwal Manggung & Event</h2>
       <div class="w-full rounded-xl overflow-hidden bg-stone-200 border border-stone-300 shadow-inner mb-3">
-        <img id="poster-img" src="jadwalmanggung.png" alt="Kalajiva Gig Schedule" class="w-full h-auto object-cover" onerror="this.style.display='none'; document.getElementById('poster-placeholder').classList.remove('hidden');">
+        <img id="poster-img" src="https://josaphatdekaaji-art.github.io/kalajivalivemusic/jadwalmanggung.png" alt="Kalajiva Gig Schedule" class="w-full h-auto object-cover" onerror="this.style.display='none'; document.getElementById('poster-placeholder').classList.remove('hidden');">
         <div id="poster-placeholder" class="hidden p-8 text-center text-stone-500 bg-stone-100/50">
           <p class="text-sm font-medium">Poster jadwal belum terbaca sempurna.</p>
         </div>
       </div>
-      <div class="bg-stone-50/80 rounded-xl p-3 border border-stone-200/50 text-xs text-stone-700 space-y-1.5">
-        <p class="font-semibold text-stone-900 text-sm mb-1">📍 Jadwal Gigs Rutin Mingguan:</p>
-        <div class="flex flex-col gap-1">
+      <div class="bg-stone-50/80 rounded-xl p-3 border border-stone-200/50 text-xs text-stone-700 space-y-3">
+        <p class="font-semibold text-stone-900 text-sm">📍 Jadwal Gigs Rutin Mingguan:</p>
+        
+        <!-- Bento Kopi -->
+        <div class="flex flex-col gap-0.5 border-b border-stone-200/60 pb-2">
           <div class="flex justify-between font-semibold text-stone-800">
             <span>🗓️ Setiap Hari Jumat (Weekly)</span>
             <span>19.00 - 23.00 WIB</span>
@@ -114,88 +116,108 @@
           <span class="text-amber-900 font-bold text-sm">Bento Kopi Jatinangor</span>
           <span class="text-[10px] text-stone-500">Jl. Kolonel Ahmad Syam, Cikeruh, Kec. Jatinangor, Bandung</span>
         </div>
+
+        <!-- Jabarano Coffee -->
+        <div class="flex flex-col gap-0.5">
+          <div class="flex justify-between font-semibold text-stone-800">
+            <span>🗓️ Setiap Hari Sabtu (Weekly)</span>
+            <span>19.00 - 22.00 WIB</span>
+          </div>
+          <span class="text-amber-900 font-bold text-sm">Jabarano Coffee Jatinangor</span>
+          <span class="text-[10px] text-stone-500">Jatinangor, Kab. Sumedang</span>
+        </div>
       </div>
     </section>
-
-    <nav class="flex gap-2 mb-6">
-      <button onclick="switchTab('songlist')" id="tab-btn-songlist" class="flex-1 py-2.5 rounded-xl text-sm font-semibold tracking-wide glass-card active-category transition shadow-sm">🎵 Songlist</button>
-      <button onclick="switchTab('request')" id="tab-btn-request" class="flex-1 py-2.5 rounded-xl text-sm font-semibold tracking-wide glass-card text-stone-600 transition shadow-sm">💬 Request & Pesan</button>
-    </nav>
-
-    <div id="tab-songlist" class="space-y-4">
-      <div class="glass-card rounded-xl p-2.5 flex items-center shadow-sm">
-        <input type="text" id="search-input" oninput="filterSongs()" placeholder="Cari judul lagu atau penyanyi..." class="w-full bg-transparent border-none outline-none px-3 py-1 text-sm text-stone-800 placeholder-stone-400">
+  <div id="stage-monitor-screen" class="fixed inset-0 bg-stone-950 text-white z-50 p-4 md:p-6 hidden flex-col select-none overflow-y-auto">
+    <div class="flex flex-wrap justify-between items-center border-b border-stone-800 pb-3 mb-4 gap-2">
+      <div>
+        <h1 class="text-amber-500 font-bold tracking-wider text-sm">KALAJIVA MONITOR PANGGUNG</h1>
       </div>
-      <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-        <button onclick="filterCategory('all')" id="chip-all" class="chip-filter px-4 py-1.5 rounded-full text-xs font-medium glass-card active-category whitespace-nowrap shadow-sm">Semua</button>
-        <button onclick="filterCategory('folk')" id="chip-folk" class="chip-filter px-4 py-1.5 rounded-full text-xs font-medium glass-card text-stone-600 whitespace-nowrap shadow-sm">🌾 Indie & Folk</button>
-        <button onclick="filterCategory('chill')" id="chip-chill" class="chip-filter px-4 py-1.5 rounded-full text-xs font-medium glass-card text-stone-600 whitespace-nowrap shadow-sm">☕ Upbeat Chill</button>
-        <button onclick="filterCategory('galau')" id="chip-galau" class="chip-filter px-4 py-1.5 rounded-full text-xs font-medium glass-card text-stone-600 whitespace-nowrap shadow-sm">💔 Sesi Galau</button>
+      <div class="flex gap-2">
+        <button onclick="toggleManageSongsModal()" class="px-3 py-1.5 bg-amber-900/80 hover:bg-amber-800 text-amber-200 text-xs font-semibold rounded-lg border border-amber-700/50 transition">
+          🎵 Kelola Songlist
+        </button>
+        <button onclick="closeStageMonitor()" class="px-3 py-1.5 bg-stone-900 text-stone-200 text-xs font-bold rounded-lg border border-stone-700 hover:bg-stone-800 transition">
+          ⬅️ Kembali
+        </button>
       </div>
-      <div id="songs-container" class="space-y-2 max-h-[50vh] overflow-y-auto pr-1"></div>
     </div>
 
-    <div id="tab-request" class="space-y-6 hidden">
-      <div class="glass-card rounded-2xl p-5 shadow-sm">
-        <h2 class="serif-title text-xl font-bold text-stone-900 mb-4">Kirim Request & Pesan</h2>
+    <!-- Metronome & Beat Box Section -->
+    <div class="bg-stone-900/90 border border-stone-800 rounded-2xl p-4 mb-4 shadow-lg">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-xs font-bold tracking-wider text-amber-400 uppercase flex items-center gap-2">
+          ⏱️ Rhythm & Metronome Tools
+        </h3>
+        <span id="bpm-display" class="text-xl font-extrabold text-amber-400">120 BPM</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Tempo & Beat Sound Control -->
         <div class="space-y-3">
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Nama / Nomor Meja</label>
-            <input type="text" id="req-sender" placeholder="Contoh: Rian Meja 4" class="w-full rounded-xl border border-stone-300 bg-white/50 px-4 py-2.5 text-sm outline-none">
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-stone-400">Tempo:</span>
+            <input type="range" id="bpm-slider" min="40" max="220" value="120" oninput="updateBPM(this.value)" class="w-full accent-amber-500 cursor-pointer">
           </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Pesan atau Salam Hangat</label>
-            <textarea id="req-message" rows="3" placeholder="Tulis titip salam atau request lagu di sini..." class="w-full rounded-xl border border-stone-300 bg-white/50 px-4 py-2.5 text-sm outline-none resize-none"></textarea>
+          
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-stone-400">Suara Beat:</span>
+            <select id="beat-sound-select" class="bg-stone-950 border border-stone-800 text-xs text-stone-200 rounded-lg px-2 py-1.5 outline-none flex-1">
+              <option value="click">Metronome Standard (Click)</option>
+              <option value="cajon">Acoustic Cajon (Bass & Tap)</option>
+              <option value="drum">Drum Kit (Kick & Snare)</option>
+            </select>
           </div>
-          <button onclick="submitRequest()" class="w-full py-3 rounded-xl bg-amber-800 text-[#FFFDD0] font-bold text-sm shadow-md hover:bg-amber-900 transition mt-2">KIRIM SEKARANG</button>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex items-center justify-center gap-3 bg-stone-950/60 p-2 rounded-xl border border-stone-800/80">
+          <button onclick="toggleMetronome()" id="metronome-btn" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold text-xs tracking-wider transition shadow-md flex items-center justify-center gap-2">
+            ▶ START RHYTHM
+          </button>
         </div>
       </div>
     </div>
 
-    <footer class="text-center mt-12 pt-6 border-t border-stone-300/40 text-xs text-stone-500">
-      <p class="font-bold text-stone-800 tracking-wide">💡 KALAJIVA MANAGEMENT</p>
-      <a href="https://wa.me/62895339899333" target="_blank" class="inline-flex items-center gap-1.5 text-emerald-800 font-extrabold mt-1.5 hover:underline text-sm">0895-3398-99333</a>
-      <p class="text-[9px] text-stone-400 mt-6">&copy; 2026 Kalajiva. Powered by Deka Aji Acoustic.</p>
-      <div class="mt-4">
-        <button onclick="showPasscodeModal()" class="text-[10px] text-stone-400/60 hover:text-stone-700 font-medium flex items-center gap-1 mx-auto">🔑 Akses Monitor Musisi</button>
-      </div>
-    </footer>
+    <div id="stage-messages-feed" class="flex-1 custom-scroll space-y-4 pr-1"></div>
   </div>
 
-  <div id="qris-modal" class="fixed inset-0 bg-stone-950/80 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-xs w-full p-6 shadow-xl border border-stone-200 text-center">
-      <h3 class="serif-title text-lg font-bold text-stone-900 mb-4">Apresiasi QRIS</h3>
-      <img src="https://i.ibb.co.com/QFRPbbHC/qris.png" alt="QRIS" class="w-full mb-4 rounded-lg">
-      <button onclick="toggleQRIS()" class="w-full py-2 rounded-xl border border-stone-300 text-xs font-semibold hover:bg-stone-50 text-stone-600 transition">Tutup</button>
-    </div>
-  </div>
-
-  <div id="passcode-modal" class="fixed inset-0 bg-stone-950/80 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-xs w-full p-6 shadow-xl border border-stone-200 text-center">
-      <h3 class="serif-title text-lg font-bold text-stone-900 mb-2">Monitor Panggung</h3>
-      <input type="password" id="pin-input" placeholder="Masukkan PIN" class="w-full text-center rounded-xl border border-stone-300 bg-stone-50 px-4 py-2.5 text-base outline-none mb-4 font-bold tracking-widest">
-      <div id="pin-error" class="text-xs text-red-500 mb-3 hidden font-medium">PIN Salah!</div>
-      <div class="flex gap-2">
-        <button onclick="hidePasscodeModal()" class="flex-1 py-2 border rounded-xl text-xs text-stone-600">Batal</button>
-        <button onclick="verifyPIN()" class="flex-1 py-2 bg-amber-800 text-white rounded-xl text-xs font-bold">Buka</button>
+  <!-- Modal Kelola Songlist -->
+  <div id="manage-songs-modal" class="fixed inset-0 bg-stone-950/90 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-stone-900 text-stone-100 rounded-2xl max-w-md w-full p-5 shadow-2xl border border-stone-800 flex flex-col max-h-[85vh]">
+      <div class="flex justify-between items-center mb-4 border-b border-stone-800 pb-2">
+        <h3 class="serif-title text-base font-bold text-amber-400">🎵 Kelola Songlist (Tambah / Hapus)</h3>
+        <button onclick="toggleManageSongsModal()" class="text-stone-400 hover:text-white text-sm font-bold px-2">✕</button>
       </div>
-    </div>
-  </div>
 
-  <div id="stage-monitor-screen" class="fixed inset-0 bg-stone-950 text-white z-50 p-6 hidden flex-col select-none">
-    <div class="flex justify-between items-center border-b border-stone-800 pb-4 mb-4">
-      <div>
-        <h1 class="text-amber-500 font-bold tracking-wider text-sm">KALAJIVA MONITOR PANGGUNG</h1>
+      <!-- Form Tambah Lagu Baru -->
+      <div class="space-y-2 mb-4 bg-stone-950 p-3 rounded-xl border border-stone-800">
+        <p class="text-[11px] font-semibold text-amber-500 uppercase tracking-wider">Tambah Lagu Baru</p>
+        <input type="text" id="new-song-title" placeholder="Judul Lagu..." class="w-full bg-stone-900 border border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-200 outline-none focus:border-amber-600">
+        <input type="text" id="new-song-artist" placeholder="Nama Penyanyi / Band..." class="w-full bg-stone-900 border border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-200 outline-none focus:border-amber-600">
+        <div class="flex gap-2">
+          <select id="new-song-category" class="bg-stone-900 border border-stone-800 text-xs text-stone-300 rounded-lg px-2 py-1.5 outline-none">
+            <option value="folk">🌾 Indie & Folk</option>
+            <option value="chill">☕ Upbeat Chill</option>
+            <option value="galau">💔 Sesi Galau</option>
+          </select>
+          <button onclick="addNewSong()" class="flex-1 py-1.5 bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold text-xs rounded-lg transition">
+            + Tambah ke Dashboard
+          </button>
+        </div>
       </div>
-      <button onclick="closeStageMonitor()" class="px-4 py-2 bg-stone-900 text-stone-200 text-xs font-bold rounded-lg border border-stone-700">⬅️ Kembali</button>
+
+      <!-- List Lagu & Tombol Hapus -->
+      <p class="text-[11px] font-semibold text-stone-400 uppercase tracking-wider mb-2">Daftar Lagu Terpasang</p>
+      <div id="manage-songs-list" class="flex-1 overflow-y-auto space-y-2 pr-1 custom-scroll"></div>
     </div>
-    <div id="stage-messages-feed" class="flex-1 overflow-y-auto custom-scroll space-y-4 pr-2"></div>
   </div>
 
   <script>
     const STAGE_PIN_HASH = "e10adc3949ba59abbe56e057f20f883e"; 
 
-    const songs = [
+    // Initial Songlist
+    let songs = [
       { id: 1, title: "Best Part", artist: "Daniel Caesar ft. H.E.R.", category: "chill" },
       { id: 2, title: "Dia", artist: "Maliq & D'Essentials", category: "chill" },
       { id: 3, title: "Juwita Malam", artist: "Ismail Marzuki", category: "chill" },
@@ -281,18 +303,33 @@
       { id: 83, title: "Ku Jatuh Hati", artist: "Original Project", category: "chill" }
     ];
 
+    // Load saved songs from localStorage if available
+    if (localStorage.getItem('kalajiva_custom_songs')) {
+      try {
+        songs = JSON.parse(localStorage.getItem('kalajiva_custom_songs'));
+      } catch (e) {
+        console.error("Failed to parse stored songs", e);
+      }
+    }
+
     let currentCategory = 'all';
     let mockMessages = [
       { id: 1, sender: "System", text: "Selamat Datang di Monitor Panggung Kalajiva. Menunggu request masuk...", time: "Now" }
     ];
 
-    window.allLiveRequests = [...mockMessages];
+    // Metronome & Audio Engine Variables
+    let audioCtx = null;
+    let isMetronomeRunning = false;
+    let metronomeBPM = 120;
+    let beatStep = 0;
+    let timerId = null;
 
     document.addEventListener("DOMContentLoaded", () => {
       renderSongs();
       renderMessages();
     });
 
+    // --- Songlist Functions ---
     window.switchTab = function(tabName) {
       const tabs = ['songlist', 'request'];
       tabs.forEach(t => {
@@ -303,13 +340,13 @@
       document.getElementById(`tab-${tabName}`).classList.remove('hidden');
       document.getElementById(`tab-btn-${tabName}`).classList.add('active-category');
       document.getElementById(`tab-btn-${tabName}`).classList.remove('text-stone-600');
-    }
+    };
 
     window.renderSongs = function() {
       const container = document.getElementById('songs-container');
       if (!container) return;
       container.innerHTML = '';
-      const query = document.getElementById('search-input').value.toLowerCase();
+      const query = (document.getElementById('search-input')?.value || '').toLowerCase();
 
       const filtered = songs.filter(song => {
         const matchQuery = song.title.toLowerCase().includes(query) || song.artist.toLowerCase().includes(query);
@@ -330,26 +367,30 @@
             <h4 class="text-sm font-bold text-stone-900">${song.title}</h4>
             <p class="text-xs text-stone-500 mt-0.5">${song.artist}</p>
           </div>
-          <button onclick="autofillRequest('${song.title}', '${song.artist}')" class="px-3 py-1.5 bg-amber-800 text-[#FFFDD0] rounded-lg text-xs font-semibold hover:bg-amber-900 transition shadow-xs">
+          <button onclick="autofillRequest('${song.title.replace(/'/g, "\\'")}', '${song.artist.replace(/'/g, "\\'")}')" class="px-3 py-1.5 bg-amber-800 text-[#FFFDD0] rounded-lg text-xs font-semibold hover:bg-amber-900 transition shadow-xs">
             + Request
           </button>
         `;
         container.appendChild(card);
       });
-    }
+    };
+
+    window.filterSongs = function() {
+      renderSongs();
+    };
 
     window.filterCategory = function(cat) {
       currentCategory = cat;
       document.querySelectorAll('.chip-filter').forEach(btn => btn.classList.remove('active-category', 'text-stone-600'));
       document.getElementById(`chip-${cat}`).classList.add('active-category');
       renderSongs();
-    }
+    };
 
     window.autofillRequest = function(title, artist) {
       switchTab('request');
       document.getElementById('req-message').value = `Halo Kak Deka, saya mau request lagu "${title}" dari ${artist}. Terima kasih! `;
       document.getElementById('req-sender').focus();
-    }
+    };
 
     window.listenToRequests = function() {
       const db = window.FirebaseDB;
@@ -357,18 +398,27 @@
       const coll = window.collection;
       if (!db || !window.FirebaseUser || !coll) return;
 
-      const reqCollection = coll(db, 'artifacts', appId, 'public', 'data', 'requests');
+      try {
+        const reqCollection = coll(db, 'artifacts', appId, 'public', 'data', 'requests');
 
-      if (typeof window.onSnapshot === 'function') {
-        window.onSnapshot(reqCollection, (snapshot) => {
-          let loaded = [];
-          snapshot.forEach(doc => { loaded.push({ id: doc.id, ...doc.data() }); });
-          loaded.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-          window.allLiveRequests = [...loaded, ...mockMessages];
-          renderMessages();
-        }, (error) => {
-          console.error("Firebase Snapshot Error:", error);
-        });
+        if (typeof window.onSnapshot === 'function') {
+          window.onSnapshot(reqCollection, (snapshot) => {
+            let loaded = [];
+            snapshot.forEach(doc => { loaded.push({ id: doc.id, ...doc.data() }); });
+            loaded.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            window.allLiveRequests = [...loaded, ...mockMessages];
+            renderMessages();
+          }, (error) => {
+            console.warn("Firebase Snapshot Permission or Network Note:", error.message);
+            // Fallback gracefully to mock / local state without throwing severe errors
+            window.allLiveRequests = [...mockMessages];
+            renderMessages();
+          });
+        }
+      } catch (err) {
+        console.warn("Firebase collection access restricted, using local state fallback.");
+        window.allLiveRequests = [...mockMessages];
+        renderMessages();
       }
     };
 
