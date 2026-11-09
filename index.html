@@ -56,7 +56,7 @@
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: #FCFAF7;
-      background-image: linear-gradient(rgba(252, 250, 247, 0.88), rgba(252, 250, 247, 0.88)), url('background.png');
+      background-image: linear-gradient(rgba(252, 250, 247, 0.88), rgba(252, 250, 247, 0.88)), url('https://josaphatdekaaji-art.github.io/kalajivalivemusic/background.png');
       background-attachment: fixed;
       background-position: center;
       background-size: cover;
@@ -79,18 +79,18 @@
     <!-- Header Profiles -->
     <header class="text-center mb-8">
       <div class="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-white/80 shadow-lg mb-4 bg-stone-200">
-        <img src="https://josaphatdekaaji-art.github.io/kalajivalivemusic/background.png" alt="Kalajiva Profile" class="w-full h-full object-cover" loading="lazy" decoding="async">
+        <img src="https://josaphatdekaaji-art.github.io/kalajivalivemusic/background.png" alt="Kalajiva Profile" class="w-full h-full object-cover" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='https://placehold.co/300x300/8C6239/FFFDD0?text=Kalajiva';">
       </div>
       <h1 class="serif-title text-4xl font-bold tracking-wide text-stone-900 mb-1">Kalajiva</h1>
       <p class="text-xs uppercase tracking-widest text-amber-800 font-semibold mb-3">Acoustic Soloist — Deka Aji</p>
       <p class="text-sm italic text-stone-600 max-w-xs mx-auto">"Menyelaraskan waktu dan jiwa lewat bait lagu dan petikan senar di sudut kota."</p>
       
       <div class="flex flex-col gap-2 mt-4 max-w-xs mx-auto">
-        <a href="https://instagram.com/kalajiva.music" target="_blank" class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-700 to-amber-900 text-[#FFFDD0] text-xs font-semibold tracking-wider shadow-md hover:opacity-95 transition">
-          FOLLOW @KALAJIVA.MUSIC
+        <a href="https://www.instagram.com/kala.jiva?obrf=b2pkcTIxdXF5NDM3" target="_blank" class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-700 to-amber-900 text-[#FFFDD0] text-xs font-semibold tracking-wider shadow-md hover:opacity-95 transition">
+          📸 FOLLOW @KALA.JIVA
         </a>
         <a href="https://wa.me/62895339899333" target="_blank" class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-800 text-[#FFFDD0] text-xs font-semibold tracking-wider shadow-md hover:opacity-95 transition">
-          BOOKING & HUBUNGI WA
+          💬 BOOKING & HUBUNGI WA
         </a>
         <button onclick="toggleQRIS()" class="flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-stone-800 text-[#FFFDD0] text-xs font-semibold tracking-wider shadow-md hover:bg-black transition">
           🎁 APRESIASI (QRIS)
@@ -165,7 +165,14 @@
             <label class="block text-xs font-semibold uppercase tracking-wider text-stone-500 mb-1">Pesan atau Salam Hangat</label>
             <textarea id="req-message" rows="3" placeholder="Tulis titip salam atau request lagu di sini..." class="w-full rounded-xl border border-stone-300 bg-white/50 px-4 py-2.5 text-sm outline-none resize-none"></textarea>
           </div>
-          <button onclick="submitRequest()" class="w-full py-3 rounded-xl bg-amber-800 text-[#FFFDD0] font-bold text-sm shadow-md hover:bg-amber-900 transition mt-2">KIRIM SEKARANG</button>
+          <div class="flex flex-col sm:flex-row gap-2 mt-2">
+            <button onclick="submitRequest()" class="flex-1 py-3 rounded-xl bg-amber-800 text-[#FFFDD0] font-bold text-xs tracking-wider shadow-md hover:bg-amber-900 transition">
+              📺 KIRIM KE MONITOR PANGGUNG
+            </button>
+            <button onclick="sendRequestViaWA()" class="flex-1 py-3 rounded-xl bg-emerald-700 text-[#FFFDD0] font-bold text-xs tracking-wider shadow-md hover:bg-emerald-800 transition flex items-center justify-center gap-1.5">
+              💬 KIRIM VIA WHATSAPP
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -184,7 +191,7 @@
   <div id="qris-modal" class="fixed inset-0 bg-stone-950/80 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-xs w-full p-6 shadow-xl border border-stone-200 text-center">
       <h3 class="serif-title text-lg font-bold text-stone-900 mb-4">Apresiasi QRIS</h3>
-      <img src="https://i.ibb.co.com/QFRPbbHC/qris.png" alt="QRIS Kalajiva" class="w-full mb-4 rounded-lg">
+      <img src="https://i.ibb.co.com/QFRPbbHC/qris.png" alt="QRIS Kalajiva" class="w-full mb-4 rounded-lg" onerror="this.onerror=null; this.src='https://placehold.co/300x300/ffffff/000000?text=Scan+QRIS';">
       <button onclick="toggleQRIS()" class="w-full py-2 rounded-xl border border-stone-300 text-xs font-semibold hover:bg-stone-50 text-stone-600 transition">Tutup</button>
     </div>
   </div>
@@ -222,7 +229,7 @@
     <div class="bg-stone-900/90 border border-stone-800 rounded-2xl p-4 mb-4 shadow-lg">
       <div class="flex items-center justify-between mb-3">
         <h3 class="text-xs font-bold tracking-wider text-amber-400 uppercase flex items-center gap-2">
-          ⏱️ Rhythm, Metronome & Custom Beat Pad
+          ⏱️ Rhythm Metronome & 16-Step Beat Pad
         </h3>
         <span id="bpm-display" class="text-xl font-extrabold text-amber-400">120 BPM</span>
       </div>
@@ -237,11 +244,15 @@
           
           <div class="flex items-center gap-2">
             <span class="text-xs text-stone-400">Mode Beat:</span>
-            <select id="beat-sound-select" class="bg-stone-950 border border-stone-800 text-xs text-stone-200 rounded-lg px-2 py-1.5 outline-none flex-1">
+            <select id="beat-sound-select" onchange="changeBeatStyle(this.value)" class="bg-stone-950 border border-stone-800 text-xs text-stone-200 rounded-lg px-2 py-1.5 outline-none flex-1">
               <option value="click">Metronome Standard (Click)</option>
               <option value="cajon">Acoustic Cajon (Bass & Tap)</option>
-              <option value="drum">Drum Kit (Kick & Snare Preset)</option>
-              <option value="custom">🥁 Custom Beat Pad (Buat Beat Sendiri)</option>
+              <option value="funk">🎷 Funk Beat (16-Step Groove)</option>
+              <option value="jazz">🎺 Jazz Swing (Shuffle Beat)</option>
+              <option value="pop">🎸 Pop Acoustic (4/4 Standard)</option>
+              <option value="blues">🎸 Blues Shuffle Pattern</option>
+              <option value="bossa">🌴 Bossa Nova Rhythm</option>
+              <option value="custom">🥁 Custom 16-Bar Pattern</option>
             </select>
           </div>
         </div>
@@ -251,90 +262,64 @@
           <button onclick="toggleMetronome()" id="metronome-btn" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold text-xs tracking-wider transition shadow-md flex items-center justify-center gap-2">
             ▶ START RHYTHM
           </button>
+          <button onclick="triggerFillIn()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-black text-xs tracking-wider transition shadow-md whitespace-nowrap active:scale-95">
+            🥁 FILL IN
+          </button>
         </div>
       </div>
 
-      <!-- Live Drum Pad & Grid Pattern Sequencer -->
+      <!-- Live Drum Pad & 16-Step Sequencer -->
       <div id="custom-beat-pad-section" class="mt-4 pt-3 border-t border-stone-800/80">
         <p class="text-[11px] font-semibold text-amber-400/90 uppercase tracking-wider mb-2">🥁 RGB MIDI Controller Beat Pads</p>
         
-        <!-- Colorful Interactive Drum Pads (MIDI Controller Style) -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-          <!-- KICK PAD (Neon Red / Crimson) -->
+        <!-- Interactive Drum Pads -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-4">
           <button onclick="playTriggerSound('kick')" id="pad-kick" class="relative group py-5 px-3 bg-gradient-to-br from-rose-600 to-red-950 border-2 border-red-400/50 hover:border-red-400 rounded-2xl text-center shadow-lg shadow-red-950/50 active:scale-95 transition-all duration-75 overflow-hidden">
-            <div class="absolute inset-0 bg-red-400/10 opacity-0 group-active:opacity-100 transition-opacity"></div>
-            <span class="block text-2xl mb-1 filter drop-shadow">🔴</span>
+            <span class="block text-2xl mb-1">🔴</span>
             <span class="text-xs font-black tracking-widest text-red-100 block">KICK</span>
-            <span class="text-[9px] font-semibold text-red-300/80 uppercase">Sub Low</span>
+            <span class="text-[9px] font-semibold text-red-300/80 uppercase">Low Kick Drum</span>
           </button>
 
-          <!-- SNARE PAD (Neon Blue / Cyan) -->
           <button onclick="playTriggerSound('snare')" id="pad-snare" class="relative group py-5 px-3 bg-gradient-to-br from-cyan-600 to-blue-950 border-2 border-cyan-400/50 hover:border-cyan-400 rounded-2xl text-center shadow-lg shadow-blue-950/50 active:scale-95 transition-all duration-75 overflow-hidden">
-            <div class="absolute inset-0 bg-cyan-400/10 opacity-0 group-active:opacity-100 transition-opacity"></div>
-            <span class="block text-2xl mb-1 filter drop-shadow">🥁</span>
+            <span class="block text-2xl mb-1">🥁</span>
             <span class="text-xs font-black tracking-widest text-cyan-100 block">SNARE</span>
-            <span class="text-[9px] font-semibold text-cyan-300/80 uppercase">Crisp Snap</span>
+            <span class="text-[9px] font-semibold text-cyan-300/80 uppercase">Low Acoustic Snare</span>
           </button>
 
-          <!-- HI-HAT PAD (Neon Amber / Yellow Gold) -->
           <button onclick="playTriggerSound('hihat')" id="pad-hihat" class="relative group py-5 px-3 bg-gradient-to-br from-amber-500 to-yellow-950 border-2 border-amber-400/50 hover:border-amber-400 rounded-2xl text-center shadow-lg shadow-yellow-950/50 active:scale-95 transition-all duration-75 overflow-hidden">
-            <div class="absolute inset-0 bg-amber-400/10 opacity-0 group-active:opacity-100 transition-opacity"></div>
-            <span class="block text-2xl mb-1 filter drop-shadow">💥</span>
+            <span class="block text-2xl mb-1">💥</span>
             <span class="text-xs font-black tracking-widest text-amber-100 block">HI-HAT</span>
             <span class="text-[9px] font-semibold text-amber-300/80 uppercase">High Metallic</span>
           </button>
 
-          <!-- CAJON PAD (Neon Emerald / Green) -->
           <button onclick="playTriggerSound('cajon')" id="pad-cajon" class="relative group py-5 px-3 bg-gradient-to-br from-emerald-600 to-emerald-950 border-2 border-emerald-400/50 hover:border-emerald-400 rounded-2xl text-center shadow-lg shadow-emerald-950/50 active:scale-95 transition-all duration-75 overflow-hidden">
-            <div class="absolute inset-0 bg-emerald-400/10 opacity-0 group-active:opacity-100 transition-opacity"></div>
-            <span class="block text-2xl mb-1 filter drop-shadow">📦</span>
+            <span class="block text-2xl mb-1">📦</span>
             <span class="text-xs font-black tracking-widest text-emerald-100 block">CAJON</span>
             <span class="text-[9px] font-semibold text-emerald-300/80 uppercase">Acoustic Tap</span>
           </button>
+
+          <button onclick="playTriggerSound('fill')" id="pad-fill" class="relative group py-5 px-3 bg-gradient-to-br from-purple-600 to-slate-900 border-2 border-purple-400/50 hover:border-purple-400 rounded-2xl text-center shadow-lg shadow-purple-950/50 active:scale-95 transition-all duration-75 overflow-hidden col-span-2 sm:col-span-1">
+            <span class="block text-2xl mb-1">⚡</span>
+            <span class="text-xs font-black tracking-widest text-purple-100 block">FILL-IN</span>
+            <span class="text-[9px] font-semibold text-purple-300/80 uppercase">Drum Roll Fill</span>
+          </button>
         </div>
 
-        <!-- Pattern Grid Sequencer -->
-        <div class="bg-stone-950 p-2.5 rounded-xl border border-stone-800 text-[10px]">
-          <p class="text-stone-400 mb-1.5 font-medium">Susun Pattern Loops (Ketukan 1 - 8):</p>
-          <div class="space-y-1.5">
-            <div class="flex items-center justify-between gap-1">
-              <span class="w-10 text-stone-400 font-bold">Kick:</span>
-              <div class="flex gap-1 flex-1 overflow-x-auto pb-0.5" id="grid-kick">
-                <button onclick="toggleGridBeat('kick', 0)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">1</button>
-                <button onclick="toggleGridBeat('kick', 1)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">2</button>
-                <button onclick="toggleGridBeat('kick', 2)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">3</button>
-                <button onclick="toggleGridBeat('kick', 3)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">4</button>
-                <button onclick="toggleGridBeat('kick', 4)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">5</button>
-                <button onclick="toggleGridBeat('kick', 5)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">6</button>
-                <button onclick="toggleGridBeat('kick', 6)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">7</button>
-                <button onclick="toggleGridBeat('kick', 7)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">8</button>
-              </div>
+        <!-- 16-Step Pattern Grid Sequencer -->
+        <div class="bg-stone-950 p-3 rounded-xl border border-stone-800 text-[10px]">
+          <p class="text-stone-400 mb-2 font-medium">Susun Pattern Sequencer (16 Bar / Step):</p>
+          <div class="space-y-2 overflow-x-auto pb-1">
+            <div class="flex items-center gap-1.5 min-w-[500px]">
+              <span class="w-12 text-rose-400 font-bold shrink-0">Kick:</span>
+              <div class="flex gap-1 flex-1" id="grid-kick"></div>
             </div>
-            <div class="flex items-center justify-between gap-1">
-              <span class="w-10 text-stone-400 font-bold">Snare:</span>
-              <div class="flex gap-1 flex-1 overflow-x-auto pb-0.5" id="grid-snare">
-                <button onclick="toggleGridBeat('snare', 0)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">1</button>
-                <button onclick="toggleGridBeat('snare', 1)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">2</button>
-                <button onclick="toggleGridBeat('snare', 2)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">3</button>
-                <button onclick="toggleGridBeat('snare', 3)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">4</button>
-                <button onclick="toggleGridBeat('snare', 4)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">5</button>
-                <button onclick="toggleGridBeat('snare', 5)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">6</button>
-                <button onclick="toggleGridBeat('snare', 6)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">7</button>
-                <button onclick="toggleGridBeat('snare', 7)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">8</button>
-              </div>
+            <div class="flex items-center gap-1.5 min-w-[500px]">
+              <span class="w-12 text-cyan-400 font-bold shrink-0">Snare:</span>
+              <div class="flex gap-1 flex-1" id="grid-snare"></div>
             </div>
-            <div class="flex items-center justify-between gap-1">
-              <span class="w-10 text-stone-400 font-bold">Hi-Hat:</span>
-              <div class="flex gap-1 flex-1 overflow-x-auto pb-0.5" id="grid-hihat">
-                <button onclick="toggleGridBeat('hihat', 0)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">1</button>
-                <button onclick="toggleGridBeat('hihat', 1)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">2</button>
-                <button onclick="toggleGridBeat('hihat', 2)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">3</button>
-                <button onclick="toggleGridBeat('hihat', 3)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">4</button>
-                <button onclick="toggleGridBeat('hihat', 4)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">5</button>
-                <button onclick="toggleGridBeat('hihat', 5)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">6</button>
-                <button onclick="toggleGridBeat('hihat', 6)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">7</button>
-                <button onclick="toggleGridBeat('hihat', 7)" class="step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400">8</button>
-              </div>
+            <div class="flex items-center gap-1.5 min-w-[500px]">
+              <span class="w-12 text-amber-400 font-bold shrink-0">Hi-Hat:</span>
+              <div class="flex gap-1 flex-1" id="grid-hihat"></div>
             </div>
           </div>
         </div>
@@ -376,10 +361,10 @@
   </div>
 
   <script>
-    // Perbaikan Hash MD5 untuk PIN 1208
-    const STAGE_PIN_HASH = "072b2a609d5069ebdfb9e830e84db890"; // Correct MD5 hash for "1208"
+    // Correct MD5 Hash for PIN "1208"
+    const STAGE_PIN_HASH = "072b2a609d5069ebdfb9e830e84db890";
 
-    // Songlist data
+    // Songlist Data Initializer
     let songs = JSON.parse(localStorage.getItem('kalajiva_custom_songs')) || [
       { id: 1, title: "Best Part", artist: "Daniel Caesar ft. H.E.R.", category: "chill" },
       { id: 2, title: "Dia", artist: "Maliq & D'Essentials", category: "chill" },
@@ -397,22 +382,52 @@
 
     let currentCategory = 'all';
     let mockMessages = [
-      { id: 1, sender: "Bento Kopi Jatinangor", text: "Selamat Datang di Monitor Panggung Kalajiva! Menunggu request lagu dari penonton...", time: "Live" }
+      { id: 1, sender: "Bento Kopi Jatinangor", text: "Selamat Datang di Monitor Panggung Kalajiva! Menunggu request lagu...", time: "Live" }
     ];
 
     window.allLiveRequests = [...mockMessages];
 
-    // Audio Engine State
+    // Web Audio Engine State
     let audioCtx = null;
     let isMetronomeRunning = false;
     let metronomeBPM = 120;
     let beatStep = 0;
     let timerId = null;
+    let isFillInActive = false;
 
+    // 16-Step Patterns
     let customPattern = {
-      kick:  [true,  false, false, false, true,  false, false, false],
-      snare: [false, false, true,  false, false, false, true,  false],
-      hihat: [true,  true,  true,  true,  true,  true,  true,  true]
+      kick:  [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false],
+      snare: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false],
+      hihat: [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false]
+    };
+
+    const stylePresets = {
+      funk: {
+        kick:  [true, false, false, true, false, false, true, false, false, true, false, false, true, false, false, false],
+        snare: [false, false, false, false, true, false, false, true, false, false, false, false, true, false, true, false],
+        hihat: [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
+      },
+      jazz: {
+        kick:  [true, false, false, false, false, false, true, false, false, false, false, false, true, false, false, false],
+        snare: [false, false, false, false, true, false, false, false, false, false, true, false, false, false, true, false],
+        hihat: [true, false, true, true, false, true, true, false, true, true, false, true, true, false, true, true]
+      },
+      pop: {
+        kick:  [true, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false],
+        snare: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false],
+        hihat: [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false]
+      },
+      blues: {
+        kick:  [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false],
+        snare: [false, false, true, false, true, false, false, true, false, false, true, false, true, false, false, true],
+        hihat: [true, false, true, true, false, true, true, false, true, true, false, true, true, false, true, true]
+      },
+      bossa: {
+        kick:  [true, false, false, true, false, false, true, false, true, false, false, true, false, false, true, false],
+        snare: [false, false, true, false, false, true, false, false, false, false, true, false, false, true, false, false],
+        hihat: [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
+      }
     };
 
     function initAudioContext() {
@@ -424,7 +439,41 @@
       }
     }
 
-    // Dynamic BPM update
+    // UI & Grid Builders
+    function build16StepGrid() {
+      const types = ['kick', 'snare', 'hihat'];
+      types.forEach(type => {
+        const container = document.getElementById(`grid-${type}`);
+        if (!container) return;
+        container.innerHTML = '';
+        for (let i = 0; i < 16; i++) {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.id = `step-${type}-${i}`;
+          btn.onclick = () => toggleGridBeat(type, i);
+          btn.className = `flex-1 py-1 text-[9px] rounded font-bold transition ${
+            customPattern[type][i] ? 'bg-amber-500 text-black' : 'bg-stone-900 text-stone-500 border border-stone-800'
+          }`;
+          btn.innerText = (i + 1).toString();
+          container.appendChild(btn);
+        }
+      });
+    }
+
+    function toggleGridBeat(type, step) {
+      customPattern[type][step] = !customPattern[type][step];
+      const select = document.getElementById('beat-sound-select');
+      if (select) select.value = 'custom';
+      build16StepGrid();
+    }
+
+    function changeBeatStyle(styleKey) {
+      if (stylePresets[styleKey]) {
+        customPattern = JSON.parse(JSON.stringify(stylePresets[styleKey]));
+        build16StepGrid();
+      }
+    }
+
     window.updateBPM = function(val) {
       metronomeBPM = parseInt(val, 10);
       const bpmDisp = document.getElementById('bpm-display');
@@ -435,7 +484,6 @@
       }
     };
 
-    // Toggle metronome start/stop
     window.toggleMetronome = function() {
       initAudioContext();
       if (isMetronomeRunning) {
@@ -454,7 +502,7 @@
         btn.className = 'w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs tracking-wider transition shadow-md flex items-center justify-center gap-2';
       }
 
-      const intervalMs = (60 / metronomeBPM) * 1000;
+      const intervalMs = (60 / metronomeBPM / 4) * 1000;
       playRhythmTick();
       timerId = setInterval(playRhythmTick, intervalMs);
     }
@@ -474,68 +522,103 @@
       const soundType = document.getElementById('beat-sound-select')?.value || 'click';
       const now = audioCtx.currentTime;
 
-      if (soundType === 'custom') {
+      // Update Visual Steps Indicator
+      ['kick', 'snare', 'hihat'].forEach(type => {
+        for (let i = 0; i < 16; i++) {
+          const btn = document.getElementById(`step-${type}-${i}`);
+          if (btn) {
+            if (i === beatStep) {
+              btn.classList.add('ring-2', 'ring-white', 'scale-105');
+            } else {
+              btn.classList.remove('ring-2', 'ring-white', 'scale-105');
+            }
+          }
+        }
+      });
+
+      // Handle Fill-In Execution
+      if (isFillInActive) {
+        if (beatStep >= 12) {
+          // Play energetic drum fill on the last 4 beats of the bar
+          if (beatStep === 12 || beatStep === 14) playSynthKick(now);
+          playSynthSnare(now);
+          if (beatStep === 15) {
+            playSynthHiHat(now);
+            isFillInActive = false; // Reset fill after section completes
+          }
+        } else {
+          executeStandardBeat(soundType, now);
+        }
+      } else {
+        executeStandardBeat(soundType, now);
+      }
+
+      beatStep = (beatStep + 1) % 16;
+    }
+
+    function executeStandardBeat(soundType, now) {
+      if (soundType === 'click') {
+        if (beatStep % 4 === 0) {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.frequency.value = beatStep === 0 ? 1200 : 800;
+          gain.gain.setValueAtTime(0.4, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        }
+      } else if (soundType === 'cajon') {
+        if (beatStep === 0 || beatStep === 8) playSynthKick(now);
+        else if (beatStep === 4 || beatStep === 12) playSynthSnare(now);
+        else if (beatStep % 2 === 0) playSynthHiHat(now);
+      } else {
         if (customPattern.kick[beatStep]) playSynthKick(now);
         if (customPattern.snare[beatStep]) playSynthSnare(now);
         if (customPattern.hihat[beatStep]) playSynthHiHat(now);
-      } else if (soundType === 'cajon') {
-        if (beatStep === 0 || beatStep === 4) playSynthKick(now);
-        else if (beatStep === 2 || beatStep === 6) playSynthSnare(now);
-        else playSynthHiHat(now);
-      } else if (soundType === 'drum') {
-        if (beatStep === 0 || beatStep === 4) playSynthKick(now);
-        if (beatStep === 2 || beatStep === 6) playSynthSnare(now);
-        playSynthHiHat(now);
-      } else {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.frequency.value = beatStep === 0 ? 1000 : (beatStep === 4 ? 850 : 650);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(now);
-        osc.stop(now + 0.05);
       }
-
-      beatStep = (beatStep + 1) % 8;
     }
 
-    // Audio Generators
+    // Dynamic Acoustic Sound Synthesis (Low Acoustic Kick & Snare Tuning)
     function playSynthKick(time = audioCtx ? audioCtx.currentTime : 0) {
       if (!audioCtx) return;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      osc.frequency.setValueAtTime(130, time);
-      osc.frequency.exponentialRampToValueAtTime(30, time + 0.12);
-      gain.gain.setValueAtTime(0.8, time);
-      gain.gain.exponentialRampToValueAtTime(0.01, time + 0.15);
+      
+      // Low sub-kick sweep tuned for rich acoustic warmth
+      osc.frequency.setValueAtTime(110, time);
+      osc.frequency.exponentialRampToValueAtTime(25, time + 0.16);
+      
+      gain.gain.setValueAtTime(0.9, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
+      
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       osc.start(time);
-      osc.stop(time + 0.15);
+      osc.stop(time + 0.18);
     }
 
     function playSynthSnare(time = audioCtx ? audioCtx.currentTime : 0) {
       if (!audioCtx) return;
       
-      // 1. Layer Badan Drum (Acoustic Shell Body Pitch Sweep)
+      // Layer 1: Warm Low Shell Body Pitch Sweep
       const bodyOsc = audioCtx.createOscillator();
       const bodyGain = audioCtx.createGain();
       bodyOsc.type = 'triangle';
-      bodyOsc.frequency.setValueAtTime(180, time);
-      bodyOsc.frequency.exponentialRampToValueAtTime(75, time + 0.1);
+      bodyOsc.frequency.setValueAtTime(130, time);
+      bodyOsc.frequency.exponentialRampToValueAtTime(55, time + 0.14);
       
       bodyGain.gain.setValueAtTime(0.7, time);
-      bodyGain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+      bodyGain.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
       
       bodyOsc.connect(bodyGain);
       bodyGain.connect(audioCtx.destination);
       bodyOsc.start(time);
-      bodyOsc.stop(time + 0.12);
+      bodyOsc.stop(time + 0.15);
 
-      // 2. Layer Kawat Snare (Filtered Snare Wires Noise)
-      const bufferSize = audioCtx.sampleRate * 0.18;
+      // Layer 2: Snare Wires Noise Snap
+      const bufferSize = audioCtx.sampleRate * 0.12;
       const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) {
@@ -544,335 +627,354 @@
       
       const noise = audioCtx.createBufferSource();
       noise.buffer = buffer;
-      
-      const filter = audioCtx.createBiquadFilter();
-      filter.type = 'highpass';
-      filter.frequency.value = 1000;
+
+      const noiseFilter = audioCtx.createBiquadFilter();
+      noiseFilter.type = 'highpass';
+      noiseFilter.frequency.value = 800; // Warm snare wire tone
 
       const noiseGain = audioCtx.createGain();
-      noiseGain.gain.setValueAtTime(0.5, time);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.16);
+      noiseGain.gain.setValueAtTime(0.35, time);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
 
-      noise.connect(filter);
-      filter.connect(noiseGain);
+      noise.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
       noiseGain.connect(audioCtx.destination);
-      
+
       noise.start(time);
-      noise.stop(time + 0.16);
     }
 
     function playSynthHiHat(time = audioCtx ? audioCtx.currentTime : 0) {
       if (!audioCtx) return;
-      const bufferSize = audioCtx.sampleRate * 0.04;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-      const noise = audioCtx.createBufferSource();
-      noise.buffer = buffer;
+      const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(0.2, time);
-      gain.gain.exponentialRampToValueAtTime(0.01, time + 0.04);
-      noise.connect(gain);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(6500, time);
+      gain.gain.setValueAtTime(0.15, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
+      osc.connect(gain);
       gain.connect(audioCtx.destination);
-      noise.start(time);
+      osc.start(time);
+      osc.stop(time + 0.04);
     }
 
-    window.playTriggerSound = function(type) {
+    function playTriggerSound(type) {
       initAudioContext();
       const now = audioCtx.currentTime;
       if (type === 'kick') playSynthKick(now);
-      if (type === 'snare') playSynthSnare(now);
-      if (type === 'hihat') playSynthHiHat(now);
-      if (type === 'cajon') playSynthSnare(now);
-
-      // Visual LED Flash for MIDI Controller Effect
-      const padEl = document.getElementById(`pad-${type}`);
-      if (padEl) {
-        padEl.classList.add('ring-4', 'ring-white', 'brightness-150', 'scale-95');
-        setTimeout(() => {
-          padEl.classList.remove('ring-4', 'ring-white', 'brightness-150', 'scale-95');
-        }, 100);
+      else if (type === 'snare') playSynthSnare(now);
+      else if (type === 'hihat') playSynthHiHat(now);
+      else if (type === 'cajon') {
+        playSynthKick(now);
+        playSynthSnare(now);
+      } else if (type === 'fill') {
+        // Instant drum fill burst
+        playSynthKick(now);
+        playSynthSnare(now);
+        setTimeout(() => playSynthSnare(audioCtx.currentTime), 90);
+        setTimeout(() => { playSynthKick(audioCtx.currentTime); playSynthHiHat(audioCtx.currentTime); }, 180);
       }
-    };
-
-    window.toggleGridBeat = function(inst, stepIndex) {
-      if (!customPattern[inst]) return;
-      customPattern[inst][stepIndex] = !customPattern[inst][stepIndex];
-      renderGridUI();
-    };
-
-    function renderGridUI() {
-      ['kick', 'snare', 'hihat'].forEach(inst => {
-        const container = document.getElementById(`grid-${inst}`);
-        if (!container) return;
-        const btns = container.querySelectorAll('.step-btn');
-        btns.forEach((btn, idx) => {
-          if (customPattern[inst][idx]) {
-            btn.className = "step-btn flex-1 py-1 rounded bg-amber-500 text-stone-950 font-bold shadow";
-          } else {
-            btn.className = "step-btn flex-1 py-1 rounded bg-stone-800 text-stone-400";
-          }
-        });
-      });
     }
 
-    // --- Tab Switching ---
-    window.switchTab = function(tabName) {
-      const tabSonglist = document.getElementById('tab-songlist');
-      const tabRequest = document.getElementById('tab-request');
-      const btnSonglist = document.getElementById('tab-btn-songlist');
-      const btnRequest = document.getElementById('tab-btn-request');
-
-      if (tabName === 'songlist') {
-        tabSonglist.classList.remove('hidden');
-        tabRequest.classList.add('hidden');
-        btnSonglist.classList.add('active-category');
-        btnSonglist.classList.remove('text-stone-600');
-        btnRequest.classList.remove('active-category');
-        btnRequest.classList.add('text-stone-600');
-      } else {
-        tabSonglist.classList.add('hidden');
-        tabRequest.classList.remove('hidden');
-        btnRequest.classList.add('active-category');
-        btnRequest.classList.remove('text-stone-600');
-        btnSonglist.classList.remove('active-category');
-        btnSonglist.classList.add('text-stone-600');
+    function triggerFillIn() {
+      initAudioContext();
+      isFillInActive = true;
+      if (!isMetronomeRunning) {
+        playTriggerSound('fill');
       }
-    };
+    }
 
-    // --- Song Filtering & Rendering ---
-    window.filterCategory = function(cat) {
-      currentCategory = cat;
-      document.querySelectorAll('.chip-filter').forEach(btn => {
-        btn.classList.remove('active-category');
-        btn.classList.add('text-stone-600');
-      });
-      const activeBtn = document.getElementById(`chip-${cat}`);
-      if (activeBtn) {
-        activeBtn.classList.add('active-category');
-        activeBtn.classList.remove('text-stone-600');
-      }
-      renderSongs();
-    };
-
-    window.filterSongs = function() {
-      renderSongs();
-    };
-
+    // App Navigation & Functions
     function renderSongs() {
       const container = document.getElementById('songs-container');
       if (!container) return;
-      const query = (document.getElementById('search-input')?.value || '').toLowerCase();
+      container.innerHTML = '';
 
-      const filtered = songs.filter(s => {
-        const matchesCategory = currentCategory === 'all' || s.category === currentCategory;
-        const matchesSearch = s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query);
-        return matchesCategory && matchesSearch;
+      const query = (document.getElementById('search-input')?.value || '').toLowerCase();
+      const filtered = songs.filter(song => {
+        const matchCategory = currentCategory === 'all' || song.category === currentCategory;
+        const matchQuery = song.title.toLowerCase().includes(query) || song.artist.toLowerCase().includes(query);
+        return matchCategory && matchQuery;
       });
 
       if (filtered.length === 0) {
-        container.innerHTML = `<div class="p-4 text-center text-xs text-stone-400 italic">Tidak ada lagu yang cocok.</div>`;
+        container.innerHTML = `<p class="text-center text-xs text-stone-400 py-6">Tidak ada lagu yang cocok.</p>`;
         return;
       }
 
-      container.innerHTML = filtered.map(s => `
-        <div class="glass-card rounded-xl p-3 flex justify-between items-center shadow-xs">
+      filtered.forEach(song => {
+        const item = document.createElement('div');
+        item.className = 'glass-card p-3 rounded-xl flex justify-between items-center shadow-xs hover:border-amber-700/50 transition';
+        item.innerHTML = `
           <div>
-            <h4 class="text-sm font-bold text-stone-900">${s.title}</h4>
-            <p class="text-xs text-stone-500">${s.artist}</p>
+            <h4 class="font-bold text-stone-900 text-sm">${song.title}</h4>
+            <p class="text-xs text-stone-500">${song.artist}</p>
           </div>
-          <button onclick="requestThisSong('${s.title.replace(/'/g, "\\'")}', '${s.artist.replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-lg bg-amber-800 hover:bg-amber-900 text-[#FFFDD0] text-xs font-semibold shadow transition">
+          <button onclick="requestThisSong('${song.title.replace(/'/g, "\\'")}', '${song.artist.replace(/'/g, "\\'")}')" class="px-3 py-1 rounded-lg bg-amber-800/10 text-amber-900 hover:bg-amber-800 hover:text-white text-xs font-semibold transition">
             Request
           </button>
-        </div>
-      `).join('');
+        `;
+        container.appendChild(item);
+      });
     }
 
-    window.requestThisSong = function(title, artist) {
-      switchTab('request');
-      const reqMsg = document.getElementById('req-message');
-      if (reqMsg) {
-        reqMsg.value = `Request Lagu: "${title}" - ${artist}`;
-        reqMsg.focus();
-      }
-    };
-
-    // --- Submit Request to Firebase & Stage Feed ---
-    window.submitRequest = function() {
-      const senderInput = document.getElementById('req-sender');
-      const messageInput = document.getElementById('req-message');
-
-      const sender = senderInput.value.trim() || "Penonton Tanpa Nama";
-      const message = messageInput.value.trim();
-
-      if (!message) {
-        alert("Silakan tulis pesan atau request lagu terlebih dahulu!");
-        return;
-      }
-
-      const newReq = {
-        sender: sender,
-        text: message,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
-      };
-
-      // Push to Firebase Firestore if available
-      if (window.FirebaseDB && window.collection && window.addDoc) {
-        window.addDoc(window.collection(window.FirebaseDB, "requests"), newReq)
-          .catch(err => console.error("Firestore Add Error:", err));
-      }
-
-      // Local fallback feed
-      window.allLiveRequests.unshift(newReq);
-      renderStageFeed();
-
-      senderInput.value = '';
-      messageInput.value = '';
-      alert("Pesan & Request kamu berhasil terkirim ke Monitor Panggung Kalajiva!");
-    };
-
-    window.listenToRequests = function() {
-      if (!window.FirebaseDB || !window.collection || !window.onSnapshot) return;
-      try {
-        window.onSnapshot(window.collection(window.FirebaseDB, "requests"), (snapshot) => {
-          const liveData = [];
-          snapshot.forEach(doc => liveData.push({ id: doc.id, ...doc.data() }));
-          liveData.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-          if (liveData.length > 0) {
-            window.allLiveRequests = liveData;
-            renderStageFeed();
-          }
-        }, (error) => {
-          console.warn("Firestore snapshot listener permission disabled. Utilizing local request feed fallback.", error.message);
-          renderStageFeed();
-        });
-      } catch (err) {
-        console.warn("Firebase listener catch block:", err);
-      }
-    };
-
-    function renderStageFeed() {
-      const feed = document.getElementById('stage-messages-feed');
-      if (!feed) return;
-
-      if (window.allLiveRequests.length === 0) {
-        feed.innerHTML = `<div class="p-6 text-center text-xs text-stone-500">Belum ada pesan terkirim.</div>`;
-        return;
-      }
-
-      feed.innerHTML = window.allLiveRequests.map(m => `
-        <div class="bg-stone-900 border border-stone-800 rounded-2xl p-4 shadow-md">
-          <div class="flex justify-between items-center mb-1">
-            <span class="text-amber-400 text-xs font-bold">${m.sender}</span>
-            <span class="text-[10px] text-stone-500">${m.time || 'Baru saja'}</span>
-          </div>
-          <p class="text-stone-200 text-sm font-medium leading-relaxed">${m.text}</p>
-        </div>
-      `).join('');
+    function filterCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.chip-filter').forEach(btn => btn.classList.remove('active-category', 'text-stone-600'));
+      const activeBtn = document.getElementById(`chip-${cat}`);
+      if (activeBtn) activeBtn.classList.add('active-category');
+      renderSongs();
     }
 
-    // --- Modals & PIN Handler ---
-    window.toggleQRIS = function() {
-      const qris = document.getElementById('qris-modal');
-      qris.classList.toggle('hidden');
-      qris.classList.toggle('flex');
-    };
+    function filterSongs() {
+      renderSongs();
+    }
 
-    window.showPasscodeModal = function() {
-      const modal = document.getElementById('passcode-modal');
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      document.getElementById('pin-input').value = '';
-      document.getElementById('pin-error').classList.add('hidden');
-    };
+    function switchTab(tab) {
+      const tabSonglist = document.getElementById('tab-songlist');
+      const tabRequest = document.getElementById('tab-request');
+      const btnSong = document.getElementById('tab-btn-songlist');
+      const btnReq = document.getElementById('tab-btn-request');
 
-    window.hidePasscodeModal = function() {
-      const modal = document.getElementById('passcode-modal');
-      modal.classList.add('hidden');
-      modal.classList.remove('flex');
-    };
-
-    window.verifyPIN = function() {
-      const pin = document.getElementById('pin-input').value.trim();
-      // Mengizinkan verifikasi PIN langsung "1208" atau pencocokan MD5 hash
-      if (pin === '1208' || (typeof md5 === 'function' && md5(pin) === STAGE_PIN_HASH)) {
-        hidePasscodeModal();
-        const stageScreen = document.getElementById('stage-monitor-screen');
-        stageScreen.classList.remove('hidden');
-        stageScreen.classList.add('flex');
-        renderStageFeed();
+      if (tab === 'songlist') {
+        tabSonglist.classList.remove('hidden');
+        tabRequest.classList.add('hidden');
+        btnSong.classList.add('active-category');
+        btnSong.classList.remove('text-stone-600');
+        btnReq.classList.remove('active-category');
+        btnReq.classList.add('text-stone-600');
       } else {
-        document.getElementById('pin-error').classList.remove('hidden');
+        tabSonglist.classList.add('hidden');
+        tabRequest.classList.remove('hidden');
+        btnReq.classList.add('active-category');
+        btnReq.classList.remove('text-stone-600');
+        btnSong.classList.remove('active-category');
+        btnSong.classList.add('text-stone-600');
       }
-    };
+    }
 
-    window.closeStageMonitor = function() {
-      const stageScreen = document.getElementById('stage-monitor-screen');
-      stageScreen.classList.add('hidden');
-      stageScreen.classList.remove('flex');
+    function requestThisSong(title, artist) {
+      switchTab('request');
+      const msgArea = document.getElementById('req-message');
+      if (msgArea) {
+        msgArea.value = `Kak, request lagu: "${title}" - ${artist}`;
+      }
+    }
+
+    function toggleQRIS() {
+      const modal = document.getElementById('qris-modal');
+      if (modal) modal.classList.toggle('hidden');
+    }
+
+    function showPasscodeModal() {
+      const modal = document.getElementById('passcode-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function hidePasscodeModal() {
+      const modal = document.getElementById('passcode-modal');
+      if (modal) modal.classList.add('hidden');
+      const err = document.getElementById('pin-error');
+      if (err) err.classList.add('hidden');
+      const pinInput = document.getElementById('pin-input');
+      if (pinInput) pinInput.value = '';
+    }
+
+    function verifyPIN() {
+      const val = (document.getElementById('pin-input')?.value || '').trim();
+      
+      // Validasi langsung string "1208" dan hash MD5
+      const isMd5Match = typeof md5 === 'function' && md5(val) === STAGE_PIN_HASH;
+      if (val === "1208" || isMd5Match) {
+        hidePasscodeModal();
+        openStageMonitor();
+      } else {
+        const err = document.getElementById('pin-error');
+        if (err) err.classList.remove('hidden');
+      }
+    }
+
+    function openStageMonitor() {
+      const screen = document.getElementById('stage-monitor-screen');
+      if (screen) {
+        screen.classList.remove('hidden');
+        screen.classList.add('flex');
+      }
+      build16StepGrid();
+      renderStageFeed();
+    }
+
+    function closeStageMonitor() {
+      const screen = document.getElementById('stage-monitor-screen');
+      if (screen) {
+        screen.classList.add('hidden');
+        screen.classList.remove('flex');
+      }
       stopMetronome();
-    };
+    }
 
-    // --- Manage Songs Modal ---
-    window.toggleManageSongsModal = function() {
+    function toggleManageSongsModal() {
       const modal = document.getElementById('manage-songs-modal');
+      if (!modal) return;
       modal.classList.toggle('hidden');
-      modal.classList.toggle('flex');
       if (!modal.classList.contains('hidden')) {
         renderManageSongsList();
       }
-    };
-
-    function renderManageSongsList() {
-      const listContainer = document.getElementById('manage-songs-list');
-      if (!listContainer) return;
-      listContainer.innerHTML = songs.map(s => `
-        <div class="flex justify-between items-center bg-stone-950 p-2.5 rounded-xl border border-stone-800 text-xs">
-          <div>
-            <span class="font-bold text-white block">${s.title}</span>
-            <span class="text-[10px] text-stone-400">${s.artist} • <span class="uppercase text-amber-500">${s.category}</span></span>
-          </div>
-          <button onclick="deleteSong(${s.id})" class="px-2 py-1 bg-red-950 hover:bg-red-900 border border-red-800 text-red-300 rounded-lg text-[10px]">
-            Hapus
-          </button>
-        </div>
-      `).join('');
     }
 
-    window.addNewSong = function() {
-      const title = document.getElementById('new-song-title').value.trim();
-      const artist = document.getElementById('new-song-artist').value.trim();
-      const category = document.getElementById('new-song-category').value;
+    function renderManageSongsList() {
+      const container = document.getElementById('manage-songs-list');
+      if (!container) return;
+      container.innerHTML = '';
 
-      if (!title || !artist) {
-        alert("Mohon isi judul lagu dan penyanyi!");
-        return;
-      }
+      songs.forEach(song => {
+        const item = document.createElement('div');
+        item.className = 'bg-stone-950 p-2.5 rounded-xl flex justify-between items-center border border-stone-800/80 text-xs';
+        item.innerHTML = `
+          <div>
+            <p class="font-bold text-stone-200">${song.title}</p>
+            <p class="text-[10px] text-stone-400">${song.artist} • <span class="capitalize text-amber-500/80">${song.category}</span></p>
+          </div>
+          <button onclick="deleteSong(${song.id})" class="px-2 py-1 bg-red-900/60 hover:bg-red-800 text-red-200 text-[10px] font-semibold rounded border border-red-700/50 transition">
+            Hapus
+          </button>
+        `;
+        container.appendChild(item);
+      });
+    }
 
-      const newSong = { id: Date.now(), title, artist, category };
-      songs.unshift(newSong);
+    function addNewSong() {
+      const titleInput = document.getElementById('new-song-title');
+      const artistInput = document.getElementById('new-song-artist');
+      const categorySelect = document.getElementById('new-song-category');
+
+      const title = titleInput?.value.trim();
+      const artist = artistInput?.value.trim();
+      const category = categorySelect?.value || 'chill';
+
+      if (!title || !artist) return;
+
+      const newSong = {
+        id: Date.now(),
+        title,
+        artist,
+        category
+      };
+
+      songs.push(newSong);
       localStorage.setItem('kalajiva_custom_songs', JSON.stringify(songs));
 
-      document.getElementById('new-song-title').value = '';
-      document.getElementById('new-song-artist').value = '';
+      if (titleInput) titleInput.value = '';
+      if (artistInput) artistInput.value = '';
 
       renderSongs();
       renderManageSongsList();
-    };
+    }
 
-    window.deleteSong = function(id) {
+    function deleteSong(id) {
       songs = songs.filter(s => s.id !== id);
       localStorage.setItem('kalajiva_custom_songs', JSON.stringify(songs));
       renderSongs();
       renderManageSongsList();
+    }
+
+    function submitRequest() {
+      const senderInput = document.getElementById('req-sender');
+      const messageInput = document.getElementById('req-message');
+
+      const sender = senderInput?.value.trim() || 'Anonim';
+      const text = messageInput?.value.trim();
+
+      if (!text) return;
+
+      const newReq = {
+        id: Date.now(),
+        sender,
+        text,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+
+      if (window.FirebaseDB && window.collection && window.addDoc) {
+        const path = `artifacts/${window.FirebaseAppId}/requests`;
+        window.addDoc(window.collection(window.FirebaseDB, path), newReq).catch(err => {
+          console.warn("Firestore error fallback to local state:", err);
+          window.allLiveRequests.unshift(newReq);
+          renderStageFeed();
+        });
+      } else {
+        window.allLiveRequests.unshift(newReq);
+        renderStageFeed();
+      }
+
+      if (senderInput) senderInput.value = '';
+      if (messageInput) messageInput.value = '';
+
+      switchTab('songlist');
+    }
+
+    function sendRequestViaWA() {
+      const senderInput = document.getElementById('req-sender');
+      const messageInput = document.getElementById('req-message');
+
+      const sender = senderInput?.value.trim() || 'Anonim';
+      const text = messageInput?.value.trim();
+
+      if (!text) {
+        alert('Silakan tulis pesan atau request lagu terlebih dahulu.');
+        return;
+      }
+
+      const phoneNumber = "62895339899333";
+      const formattedText = `Halo Kalajiva! 👋%0A%0A*Dari:* ${encodeURIComponent(sender)}%0A*Pesan / Request:* %0A${encodeURIComponent(text)}`;
+      const waUrl = `https://wa.me/${phoneNumber}?text=${formattedText}`;
+
+      window.open(waUrl, '_blank');
+    }
+
+    function renderStageFeed() {
+      const container = document.getElementById('stage-messages-feed');
+      if (!container) return;
+      container.innerHTML = '';
+
+      window.allLiveRequests.forEach(req => {
+        const card = document.createElement('div');
+        card.className = 'bg-stone-900 border border-stone-800 rounded-xl p-3.5 shadow-md';
+        card.innerHTML = `
+          <div class="flex justify-between items-center mb-1">
+            <span class="font-bold text-amber-400 text-xs">${req.sender}</span>
+            <span class="text-[10px] text-stone-500">${req.time}</span>
+          </div>
+          <p class="text-sm text-stone-200 font-medium">${req.text}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    window.listenToRequests = function() {
+      if (!window.FirebaseDB || !window.collection || !window.onSnapshot) return;
+      const path = `artifacts/${window.FirebaseAppId}/requests`;
+      try {
+        window.onSnapshot(window.collection(window.FirebaseDB, path), (snapshot) => {
+          const list = [];
+          snapshot.forEach(doc => {
+            list.push({ id: doc.id, ...doc.data() });
+          });
+          if (list.length > 0) {
+            window.allLiveRequests = [...list, ...mockMessages];
+            renderStageFeed();
+          }
+        }, (error) => {
+          console.warn("Firestore permission issue, fallback to local state:", error);
+        });
+      } catch (err) {
+        console.warn("Firestore error:", err);
+      }
     };
 
-    // Initialization on load
-    window.addEventListener('DOMContentLoaded', () => {
+    window.onload = function() {
       renderSongs();
-      renderGridUI();
-    });
+      build16StepGrid();
+      renderStageFeed();
+    };
   </script>
 </body>
 </html>
