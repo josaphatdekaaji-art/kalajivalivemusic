@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kalajiva - Live Performance Interaction</title>
+  <!-- Load Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
+  <!-- Firebase SDK Module -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = typeof __firebase_config !== 'undefined' 
       ? JSON.parse(__firebase_config) 
@@ -25,28 +27,35 @@
 
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'kalajiva-app';
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    try {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
 
-    window.FirebaseDB = db;
-    window.FirebaseAppId = appId;
-    window.collection = collection;
-    window.addDoc = addDoc;
-    window.onSnapshot = onSnapshot;
+      window.FirebaseDB = db;
+      window.FirebaseAppId = appId;
+      window.collection = collection;
+      window.addDoc = addDoc;
+      window.onSnapshot = onSnapshot;
+      window.deleteDoc = deleteDoc;
+      window.doc = doc;
 
-    signInAnonymously(auth).catch(err => console.error("Firebase Auth Error:", err));
+      signInAnonymously(auth).catch(err => console.warn("Firebase Auth Offline Mode:", err));
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        window.FirebaseUser = user;
-        if (typeof window.listenToRequests === 'function') {
-          window.listenToRequests();
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          window.FirebaseUser = user;
+          if (typeof window.listenToRequests === 'function') {
+            window.listenToRequests();
+          }
         }
-      }
-    });
+      });
+    } catch (e) {
+      console.warn("Firebase init fallback to local mode:", e);
+    }
   </script>
 
+  <!-- MD5 Library & Google Fonts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -64,24 +73,33 @@
     .serif-title { font-family: 'Playfair Display', serif; }
     .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.8); }
     .active-category { background-color: #8C6239 !important; color: #FFFDD0 !important; }
-    .custom-scroll::-webkit-scrollbar { width: 8px; }
-    .custom-scroll::-webkit-scrollbar-track { background: #111; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-    .hidden { display: none !important; }
-    .flex { display: flex !important; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #1c1917; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #44403c; border-radius: 4px; }
+    @keyframes padFlash {
+      0% { transform: scale(0.95); filter: brightness(1.55); }
+      100% { transform: scale(1); filter: brightness(1); }
+    }
+    .pad-hit { animation: padFlash 0.14s ease-out; }
   </style>
 </head>
 <body class="text-stone-800 min-h-screen antialiased">
+
+  <!-- Toast Notification -->
+  <div id="toast-notif" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] bg-stone-900 text-[#FFFDD0] px-5 py-3 rounded-2xl shadow-2xl border border-amber-500/40 text-xs font-semibold tracking-wide hidden items-center gap-2 transition-all">
+    <span id="toast-icon">✅</span>
+    <span id="toast-text">Pesan terkirim ke monitor panggung!</span>
+  </div>
 
   <!-- ================= MAIN DASHBOARD USER ================= -->
   <div id="main-web-content" class="max-w-md mx-auto px-4 py-8 pb-12">
     
     <!-- Header Profiles -->
     <header class="text-center mb-8">
-      <div class="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-white/80 shadow-lg mb-4 bg-stone-200">
+      <div onclick="handleSecretLogoTap()" class="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-white/80 shadow-lg mb-4 bg-stone-200 cursor-pointer select-none">
         <img src="https://josaphatdekaaji-art.github.io/kalajivalivemusic/background.png" alt="Kalajiva Profile" class="w-full h-full object-cover" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='https://placehold.co/300x300/8C6239/FFFDD0?text=Kalajiva';">
       </div>
-      <h1 class="serif-title text-4xl font-bold tracking-wide text-stone-900 mb-1">Kalajiva</h1>
+      <h1 onclick="handleSecretLogoTap()" class="serif-title text-4xl font-bold tracking-wide text-stone-900 mb-1 cursor-pointer select-none">Kalajiva</h1>
       <p class="text-xs uppercase tracking-widest text-amber-800 font-semibold mb-3">Acoustic Soloist — Deka Aji</p>
       <p class="text-sm italic text-stone-600 max-w-xs mx-auto">"Menyelaraskan waktu dan jiwa lewat bait lagu dan petikan senar di sudut kota."</p>
       
@@ -110,7 +128,6 @@
       <div class="bg-stone-50/80 rounded-xl p-3 border border-stone-200/50 text-xs text-stone-700 space-y-3">
         <p class="font-semibold text-stone-900 text-sm">📍 Jadwal Gigs Rutin Mingguan:</p>
         
-        <!-- Kalajiva Live Every Weekend -->
         <div class="flex flex-col gap-0.5 pb-2 border-b border-stone-200/70">
           <div class="flex justify-between font-semibold text-stone-800">
             <span>🗓️ Every Weekend (Sabtu & Minggu)</span>
@@ -120,7 +137,6 @@
           <span class="text-[10px] text-stone-500">Info & Booking: Instagram @kala.jiva</span>
         </div>
 
-        <!-- Jabarano Coffee -->
         <div class="flex flex-col gap-0.5">
           <div class="flex justify-between font-semibold text-stone-800">
             <span>🗓️ Setiap Hari Sabtu (Every Saturday)</span>
@@ -182,7 +198,9 @@
       <a href="https://wa.me/62895339899333" target="_blank" class="inline-flex items-center gap-1.5 text-emerald-800 font-extrabold mt-1.5 hover:underline text-sm">0895-3398-99333</a>
       <p class="text-[9px] text-stone-400 mt-6">&copy; 2026 Kalajiva. Powered by Deka Aji Acoustic.</p>
       <div class="mt-4">
-        <button onclick="showPasscodeModal()" class="text-[10px] text-stone-400/60 hover:text-stone-700 font-medium flex items-center gap-1 mx-auto">🔑 Akses Monitor Musisi</button>
+        <button onclick="showPasscodeModal()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-stone-200/70 hover:bg-stone-300/80 text-stone-600 hover:text-stone-900 text-[11px] font-semibold transition">
+          🔒 Monitor Panggung
+        </button>
       </div>
     </footer>
   </div>
@@ -199,135 +217,229 @@
   <!-- PIN Passcode Modal -->
   <div id="passcode-modal" class="fixed inset-0 bg-stone-950/80 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl max-w-xs w-full p-6 shadow-xl border border-stone-200 text-center">
-      <h3 class="serif-title text-lg font-bold text-stone-900 mb-2">Monitor Panggung</h3>
-      <input type="password" id="pin-input" placeholder="Masukkan PIN" class="w-full text-center rounded-xl border border-stone-300 bg-stone-50 px-4 py-2.5 text-base outline-none mb-4 font-bold tracking-widest">
-      <div id="pin-error" class="text-xs text-red-500 mb-3 hidden font-medium">PIN Salah! (Gunakan 1208)</div>
+      <h3 class="serif-title text-lg font-bold text-stone-900 mb-1">Kalajiva Stage System</h3>
+      <p class="text-[11px] text-stone-500 mb-4">Masukkan password untuk membuka monitor panggung</p>
+      <input type="password" id="pin-input" inputmode="numeric" maxlength="8" onkeydown="if(event.key==='Enter') verifyPIN()" placeholder="••••" class="w-full text-center rounded-xl border border-stone-300 bg-stone-50 px-4 py-2.5 text-base outline-none mb-3 font-bold tracking-widest">
+      <div id="pin-error" class="text-xs text-red-500 mb-3 hidden font-medium">Password salah! Akses ditolak.</div>
       <div class="flex gap-2">
-        <button onclick="hidePasscodeModal()" class="flex-1 py-2 border rounded-xl text-xs text-stone-600">Batal</button>
-        <button onclick="verifyPIN()" class="flex-1 py-2 bg-amber-800 text-white rounded-xl text-xs font-bold">Buka</button>
+        <button onclick="hidePasscodeModal()" class="flex-1 py-2 border rounded-xl text-xs text-stone-600 hover:bg-stone-50 transition">Batal</button>
+        <button onclick="verifyPIN()" class="flex-1 py-2 bg-amber-800 hover:bg-amber-900 text-white rounded-xl text-xs font-bold transition">Buka Sistem</button>
       </div>
     </div>
   </div>
 
   <!-- ================= STAGE MONITOR FOR MUSICIANS ================= -->
-  <div id="stage-monitor-screen" class="fixed inset-0 bg-stone-950 text-white z-50 p-4 md:p-6 hidden flex-col select-none overflow-y-auto">
+  <div id="stage-monitor-screen" class="fixed inset-0 bg-stone-950 text-white z-50 p-3 md:p-6 hidden flex-col select-none overflow-y-auto">
     <div class="flex flex-wrap justify-between items-center border-b border-stone-800 pb-3 mb-4 gap-2">
-      <div>
-        <h1 class="text-amber-500 font-bold tracking-wider text-sm">KALAJIVA MONITOR PANGGUNG</h1>
+      <div class="flex items-center gap-3">
+        <h1 class="text-amber-500 font-bold tracking-wider text-sm">KALAJIVA STAGE CONSOLE</h1>
+        <!-- Visual 4-Beat LED Indicator -->
+        <div class="flex items-center gap-1.5 bg-stone-900 px-2.5 py-1 rounded-full border border-stone-800">
+          <span id="beat-led-0" class="w-2.5 h-2.5 rounded-full bg-stone-700 transition-all"></span>
+          <span id="beat-led-1" class="w-2.5 h-2.5 rounded-full bg-stone-700 transition-all"></span>
+          <span id="beat-led-2" class="w-2.5 h-2.5 rounded-full bg-stone-700 transition-all"></span>
+          <span id="beat-led-3" class="w-2.5 h-2.5 rounded-full bg-stone-700 transition-all"></span>
+        </div>
       </div>
       <div class="flex gap-2">
         <button onclick="toggleManageSongsModal()" class="px-3 py-1.5 bg-amber-900/80 hover:bg-amber-800 text-amber-200 text-xs font-semibold rounded-lg border border-amber-700/50 transition">
           🎵 Kelola Songlist
         </button>
         <button onclick="closeStageMonitor()" class="px-3 py-1.5 bg-stone-900 text-stone-200 text-xs font-bold rounded-lg border border-stone-700 hover:bg-stone-800 transition">
-          ⬅️ Kembali
+          ⬅️ Keluar
         </button>
       </div>
     </div>
 
-    <!-- Metronome & Beat Sequencer Control -->
-    <div class="bg-stone-900/90 border border-stone-800 rounded-2xl p-4 mb-4 shadow-lg">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="text-xs font-bold tracking-wider text-amber-400 uppercase flex items-center gap-2">
-          ⏱️ Rhythm Metronome & 16-Step Beat Pad
-        </h3>
-        <span id="bpm-display" class="text-xl font-extrabold text-amber-400">120 BPM</span>
+    <!-- Live Request Feed for Stage (Placed at Top) -->
+    <div class="bg-stone-900/95 border border-stone-800 rounded-2xl p-4 mb-4 shadow-xl">
+      <div class="flex justify-between items-center mb-3">
+        <div class="flex items-center gap-2">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-amber-400">📥 Request & Pesan Pengunjung (Terbaru di Atas)</h2>
+          <span id="request-counter" class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full font-bold">0 Pesan</span>
+        </div>
+        <button onclick="toggleRequestFeedPanel()" id="toggle-feed-btn" class="px-2.5 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-[10px] font-semibold border border-stone-700 transition">
+          Sembunyikan
+        </button>
+      </div>
+      <div id="stage-messages-feed" class="max-h-56 overflow-y-auto custom-scroll space-y-2.5 pr-1"></div>
+    </div>
+
+    <!-- Acoustic Rhythm Station & 36-Bar Beat Sequencer -->
+    <div class="bg-stone-900/95 border border-stone-800 rounded-2xl p-4 mb-4 shadow-xl">
+      
+      <!-- Top Row: Style Preset + BPM + Tap Tempo -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-center mb-4">
+        
+        <!-- Genre / Song Style Selector -->
+        <div class="lg:col-span-5">
+          <label class="block text-[10px] font-bold uppercase tracking-wider text-amber-400/90 mb-1">🎸 Style Lagu (Auto-Groove)</label>
+          <select id="beat-sound-select" onchange="changeBeatStyle(this.value)" class="w-full bg-stone-950 border border-stone-700 text-xs font-semibold text-stone-100 rounded-xl px-3 py-2.5 outline-none focus:border-amber-500">
+            <option value="pop">🎸 Pop Acoustic — Santai & Modern (108 BPM)</option>
+            <option value="ballad">💔 Ballad / Sesi Galau — Slow Emosional (74 BPM)</option>
+            <option value="jazz">🎺 Jazz Swing — Cafe Lounge Shuffle (118 BPM)</option>
+            <option value="blues">🎷 Blues Shuffle — 12/8 Groovy Blues (92 BPM)</option>
+            <option value="reggae">🌴 Reggae Skank — Off-Beat Santai (86 BPM)</option>
+            <option value="rock">🔥 Rock / Upbeat — Enerjik & Penuh (132 BPM)</option>
+            <option value="bossa">☕ Bossa Nova — Akustik Klasik (115 BPM)</option>
+            <option value="cajon">📦 Pure Acoustic Cajon — Raw Unplugged (100 BPM)</option>
+            <option value="click">⏱️ Metronome Click Only</option>
+            <option value="custom">🎛️ Custom 36-Bar Pattern</option>
+          </select>
+        </div>
+
+        <!-- BPM Slider & Fine Tune -->
+        <div class="lg:col-span-4 bg-stone-950/80 border border-stone-800 rounded-xl p-2.5">
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-stone-400">Tempo Speed</span>
+            <div class="flex items-center gap-1.5">
+              <button onclick="adjustBPM(-1)" class="w-6 h-6 rounded bg-stone-800 hover:bg-stone-700 text-xs font-bold text-stone-200">-</button>
+              <span id="bpm-display" class="text-sm font-black text-amber-400 min-w-[68px] text-center">108 BPM</span>
+              <button onclick="adjustBPM(1)" class="w-6 h-6 rounded bg-stone-800 hover:bg-stone-700 text-xs font-bold text-stone-200">+</button>
+            </div>
+          </div>
+          <input type="range" id="bpm-slider" min="40" max="220" value="108" oninput="updateBPM(this.value)" class="w-full accent-amber-500 cursor-pointer h-1.5">
+        </div>
+
+        <!-- Tap Tempo & Play Controls -->
+        <div class="lg:col-span-3 flex gap-2 h-full">
+          <button onclick="handleTapTempo()" id="tap-tempo-btn" class="flex-1 py-2.5 px-2 rounded-xl bg-stone-800 hover:bg-stone-700 active:bg-amber-600 active:text-stone-950 border border-amber-500/40 text-amber-300 font-extrabold text-xs tracking-wider transition flex flex-col items-center justify-center shadow-md">
+            <span>👆 TAP TEMPO</span>
+            <span id="tap-status" class="text-[9px] font-normal text-stone-400">Ketuk ketukan</span>
+          </button>
+          <button onclick="toggleMetronome()" id="metronome-btn" class="flex-1 py-2.5 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-black text-xs tracking-wider transition shadow-md flex items-center justify-center gap-1.5">
+            ▶ PLAY
+          </button>
+        </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <!-- Tempo & Sound Selection -->
-        <div class="space-y-3">
-          <div class="flex items-center gap-3">
-            <span class="text-xs text-stone-400">Tempo:</span>
-            <input type="range" id="bpm-slider" min="40" max="220" value="120" oninput="updateBPM(this.value)" class="w-full accent-amber-500 cursor-pointer">
+      <!-- Acoustic Live Drum Pads -->
+      <div class="pt-3 border-t border-stone-800/80">
+        <div class="flex justify-between items-center mb-2.5">
+          <p class="text-[11px] font-bold text-amber-400/90 uppercase tracking-wider">🥁 Acoustic Drum Kit & Percussion Pads</p>
+          <span class="text-[10px] text-stone-500">Sentuh pad untuk bunyi drum kit asli</span>
+        </div>
+        
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 mb-4">
+          <button onclick="playTriggerSound('kick')" id="pad-kick" class="py-3.5 px-2 bg-gradient-to-br from-rose-700 to-red-950 border border-rose-400/50 hover:border-rose-300 rounded-2xl text-center shadow-lg active:scale-95 transition-all">
+            <span class="block text-lg mb-0.5">🥁</span>
+            <span class="text-[10px] font-black tracking-wider text-rose-100 block">BASS DRUM</span>
+            <span class="text-[8px] font-medium text-rose-300/80">22" Maple Kick</span>
+          </button>
+
+          <button onclick="playTriggerSound('snare')" id="pad-snare" class="py-3.5 px-2 bg-gradient-to-br from-emerald-600 to-emerald-950 border border-emerald-400/50 hover:border-emerald-300 rounded-2xl text-center shadow-lg active:scale-95 transition-all">
+            <span class="block text-lg mb-0.5">🪘</span>
+            <span class="text-[10px] font-black tracking-wider text-emerald-100 block">SNARE DRUM</span>
+            <span class="text-[8px] font-medium text-emerald-300/80">14" Brass Snare</span>
+          </button>
+
+          <button onclick="playTriggerSound('cajon_bass')" id="pad-cajon_bass" class="py-3.5 px-2 bg-gradient-to-br from-amber-600 to-amber-950 border border-amber-400/50 hover:border-amber-300 rounded-2xl text-center shadow-lg active:scale-95 transition-all">
+            <span class="block text-lg mb-0.5">📦</span>
+            <span class="text-[10px] font-black tracking-wider text-amber-100 block">CAJON BASS</span>
+            <span class="text-[8px] font-medium text-amber-300/80">Wood Low Thump</span>
+          </button>
+
+          <button onclick="playTriggerSound('tom')" id="pad-tom" class="py-3.5 px-2 bg-gradient-to-br from-orange-600 to-orange-950 border border-orange-400/50 hover:border-orange-300 rounded-2xl text-center shadow-lg active:scale-95 transition-all">
+            <span class="block text-lg mb-0.5">🔴</span>
+            <span class="text-[10px] font-black tracking-wider text-orange-100 block">TOM-TOM</span>
+            <span class="text-[8px] font-medium text-orange-300/80">12" Rack Tom</span>
+          </button>
+
+          <button onclick="playTriggerSound('floor')" id="pad-floor" class="py-3.5 px-2 bg-gradient-to-br from-indigo-600 to-indigo-950 border border-indigo-400/50 hover:border-indigo-300 rounded-2xl text-center shadow-lg active:scale-95 transition-all">
+            <span class="block text-lg mb-0.5">🛢️</span>
+            <span class="text-[10px] font-black tracking-wider text-indigo-100 block">FLOOR TOM</span>
+            <span class="text-[8px] font-medium text-indigo-300/80">16" Deep Floor</span>
+          </button>
+
+          <button onclick="playTriggerSound('hihat')" id="pad-hihat" class="py-3.5 px-2 bg-gradient-to-br from-cyan-600 to-slate-950 border border-cyan-400/50 hover:border-cyan-300 rounded-2xl text-center shadow-lg active:scale-95 transition-all">
+            <span class="block text-lg mb-0.5">📀</span>
+            <span class="text-[10px] font-black tracking-wider text-cyan-100 block">HI-HAT</span>
+            <span class="text-[8px] font-medium text-cyan-300/80">14" Crisp Hat</span>
+          </button>
+
+          <button onclick="playTriggerSound('crash')" id="pad-crash" class="py-3.5 px-2 bg-gradient-to-br from-yellow-500 to-amber-950 border border-yellow-300/60 hover:border-yellow-200 rounded-2xl text-center shadow-lg active:scale-95 transition-all">
+            <span class="block text-lg mb-0.5">✨</span>
+            <span class="text-[10px] font-black tracking-wider text-yellow-100 block">CRASH CYMBAL</span>
+            <span class="text-[8px] font-medium text-yellow-200/80">18" Thin Crash</span>
+          </button>
+
+          <button onclick="triggerFillIn()" id="pad-fill" class="py-3.5 px-2 bg-gradient-to-br from-purple-600 to-fuchsia-950 border border-purple-400/60 hover:border-purple-300 rounded-2xl text-center shadow-lg active:scale-95 transition-all">
+            <span class="block text-lg mb-0.5">⚡</span>
+            <span class="text-[10px] font-black tracking-wider text-purple-100 block">FILL IN</span>
+            <span class="text-[8px] font-medium text-purple-300/80">Drum Roll + Crash</span>
+          </button>
+        </div>
+
+        <!-- 32-Step / 8-Bar Sequencer Grid -->
+        <div class="bg-stone-950 p-3 rounded-xl border border-stone-800 text-[10px]">
+          <div class="flex flex-wrap justify-between items-center gap-2 mb-2.5">
+            <p class="text-stone-300 font-bold">🎛️ 32-Step / 8-Bar Pattern Sequencer (Bar 1 - Bar 8):</p>
+            <button onclick="clearCustomPattern()" class="px-2.5 py-1 rounded bg-stone-900 hover:bg-red-950 text-stone-400 hover:text-red-300 border border-stone-800 text-[10px] font-semibold transition">
+              🧹 Bersihkan Grid
+            </button>
           </div>
           
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-stone-400">Mode Beat:</span>
-            <select id="beat-sound-select" onchange="changeBeatStyle(this.value)" class="bg-stone-950 border border-stone-800 text-xs text-stone-200 rounded-lg px-2 py-1.5 outline-none flex-1">
-              <option value="click">Metronome Standard (Click)</option>
-              <option value="cajon">Acoustic Cajon (Bass & Tap)</option>
-              <option value="funk">🎷 Funk Beat (16-Step Groove)</option>
-              <option value="jazz">🎺 Jazz Swing (Shuffle Beat)</option>
-              <option value="pop">🎸 Pop Acoustic (4/4 Standard)</option>
-              <option value="blues">🎸 Blues Shuffle Pattern</option>
-              <option value="bossa">🌴 Bossa Nova Rhythm</option>
-              <option value="custom">🥁 Custom 16-Bar Pattern</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Controls -->
-        <div class="flex items-center justify-center gap-3 bg-stone-950/60 p-2 rounded-xl border border-stone-800/80">
-          <button onclick="toggleMetronome()" id="metronome-btn" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold text-xs tracking-wider transition shadow-md flex items-center justify-center gap-2">
-            ▶ START RHYTHM
-          </button>
-          <button onclick="triggerFillIn()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-black text-xs tracking-wider transition shadow-md whitespace-nowrap active:scale-95">
-            🥁 FILL IN
-          </button>
-        </div>
-      </div>
-
-      <!-- Live Drum Pad & 16-Step Sequencer -->
-      <div id="custom-beat-pad-section" class="mt-4 pt-3 border-t border-stone-800/80">
-        <p class="text-[11px] font-semibold text-amber-400/90 uppercase tracking-wider mb-2">🥁 RGB MIDI Controller Beat Pads</p>
-        
-        <!-- Interactive Drum Pads -->
-        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-4">
-          <button onclick="playTriggerSound('kick')" id="pad-kick" class="relative group py-5 px-3 bg-gradient-to-br from-rose-600 to-red-950 border-2 border-red-400/50 hover:border-red-400 rounded-2xl text-center shadow-lg shadow-red-950/50 active:scale-95 transition-all duration-75 overflow-hidden">
-            <span class="block text-2xl mb-1">🔴</span>
-            <span class="text-xs font-black tracking-widest text-red-100 block">KICK</span>
-            <span class="text-[9px] font-semibold text-red-300/80 uppercase">Low Kick Drum</span>
-          </button>
-
-          <button onclick="playTriggerSound('snare')" id="pad-snare" class="relative group py-5 px-3 bg-gradient-to-br from-cyan-600 to-blue-950 border-2 border-cyan-400/50 hover:border-cyan-400 rounded-2xl text-center shadow-lg shadow-blue-950/50 active:scale-95 transition-all duration-75 overflow-hidden">
-            <span class="block text-2xl mb-1">🥁</span>
-            <span class="text-xs font-black tracking-widest text-cyan-100 block">SNARE</span>
-            <span class="text-[9px] font-semibold text-cyan-300/80 uppercase">Low Acoustic Snare</span>
-          </button>
-
-          <button onclick="playTriggerSound('hihat')" id="pad-hihat" class="relative group py-5 px-3 bg-gradient-to-br from-amber-500 to-yellow-950 border-2 border-amber-400/50 hover:border-amber-400 rounded-2xl text-center shadow-lg shadow-yellow-950/50 active:scale-95 transition-all duration-75 overflow-hidden">
-            <span class="block text-2xl mb-1">💥</span>
-            <span class="text-xs font-black tracking-widest text-amber-100 block">HI-HAT</span>
-            <span class="text-[9px] font-semibold text-amber-300/80 uppercase">High Metallic</span>
-          </button>
-
-          <button onclick="playTriggerSound('cajon')" id="pad-cajon" class="relative group py-5 px-3 bg-gradient-to-br from-emerald-600 to-emerald-950 border-2 border-emerald-400/50 hover:border-emerald-400 rounded-2xl text-center shadow-lg shadow-emerald-950/50 active:scale-95 transition-all duration-75 overflow-hidden">
-            <span class="block text-2xl mb-1">📦</span>
-            <span class="text-xs font-black tracking-widest text-emerald-100 block">CAJON</span>
-            <span class="text-[9px] font-semibold text-emerald-300/80 uppercase">Acoustic Tap</span>
-          </button>
-
-          <button onclick="playTriggerSound('fill')" id="pad-fill" class="relative group py-5 px-3 bg-gradient-to-br from-purple-600 to-slate-900 border-2 border-purple-400/50 hover:border-purple-400 rounded-2xl text-center shadow-lg shadow-purple-950/50 active:scale-95 transition-all duration-75 overflow-hidden col-span-2 sm:col-span-1">
-            <span class="block text-2xl mb-1">⚡</span>
-            <span class="text-xs font-black tracking-widest text-purple-100 block">FILL-IN</span>
-            <span class="text-[9px] font-semibold text-purple-300/80 uppercase">Drum Roll Fill</span>
-          </button>
-        </div>
-
-        <!-- 16-Step Pattern Grid Sequencer -->
-        <div class="bg-stone-950 p-3 rounded-xl border border-stone-800 text-[10px]">
-          <p class="text-stone-400 mb-2 font-medium">Susun Pattern Sequencer (16 Bar / Step):</p>
-          <div class="space-y-2 overflow-x-auto pb-1">
-            <div class="flex items-center gap-1.5 min-w-[500px]">
-              <span class="w-12 text-rose-400 font-bold shrink-0">Kick:</span>
-              <div class="flex gap-1 flex-1" id="grid-kick"></div>
+          <div class="space-y-2 overflow-x-auto pb-1.5 custom-scroll">
+            <!-- Bar Header (32 Steps = 8 Bars of 4 steps) -->
+            <div class="flex items-center gap-1.5 min-w-[840px] text-[9px] text-stone-500 font-bold">
+              <span class="w-24 shrink-0">INSTRUMEN</span>
+              <div class="grid gap-1 flex-1 text-center" style="grid-template-columns: repeat(32, minmax(0, 1fr));">
+                <span class="col-span-4 bg-stone-900/90 rounded py-0.5 text-amber-500/80">BAR 1</span>
+                <span class="col-span-4 bg-stone-900/90 rounded py-0.5 text-amber-500/80">BAR 2</span>
+                <span class="col-span-4 bg-stone-900/90 rounded py-0.5 text-amber-500/80">BAR 3</span>
+                <span class="col-span-4 bg-stone-900/90 rounded py-0.5 text-amber-500/80">BAR 4</span>
+                <span class="col-span-4 bg-stone-900/90 rounded py-0.5 text-amber-500/80">BAR 5</span>
+                <span class="col-span-4 bg-stone-900/90 rounded py-0.5 text-amber-500/80">BAR 6</span>
+                <span class="col-span-4 bg-stone-900/90 rounded py-0.5 text-amber-500/80">BAR 7</span>
+                <span class="col-span-4 bg-stone-900/90 rounded py-0.5 text-amber-500/80">BAR 8</span>
+              </div>
             </div>
-            <div class="flex items-center gap-1.5 min-w-[500px]">
-              <span class="w-12 text-cyan-400 font-bold shrink-0">Snare:</span>
-              <div class="flex gap-1 flex-1" id="grid-snare"></div>
+
+            <!-- Row 1: Bass Drum -->
+            <div class="flex items-center gap-1.5 min-w-[840px]">
+              <span id="label-row-kick" class="w-24 text-rose-400 font-bold shrink-0">🥁 Bass Drum</span>
+              <div class="grid gap-1 flex-1" style="grid-template-columns: repeat(32, minmax(0, 1fr));" id="grid-kick"></div>
             </div>
-            <div class="flex items-center gap-1.5 min-w-[500px]">
-              <span class="w-12 text-amber-400 font-bold shrink-0">Hi-Hat:</span>
-              <div class="flex gap-1 flex-1" id="grid-hihat"></div>
+
+            <!-- Row 2: Snare Drum -->
+            <div class="flex items-center gap-1.5 min-w-[840px]">
+              <span id="label-row-snare" class="w-24 text-emerald-400 font-bold shrink-0">🪘 Snare Drum</span>
+              <div class="grid gap-1 flex-1" style="grid-template-columns: repeat(32, minmax(0, 1fr));" id="grid-snare"></div>
+            </div>
+
+            <!-- Row 3: Tom-Tom -->
+            <div class="flex items-center gap-1.5 min-w-[840px]">
+              <span class="w-24 text-orange-400 font-bold shrink-0">🔴 Tom-Tom</span>
+              <div class="grid gap-1 flex-1" style="grid-template-columns: repeat(32, minmax(0, 1fr));" id="grid-tom"></div>
+            </div>
+
+            <!-- Row 4: Floor Tom -->
+            <div class="flex items-center gap-1.5 min-w-[840px]">
+              <span class="w-24 text-indigo-400 font-bold shrink-0">🛢️ Floor Tom</span>
+              <div class="grid gap-1 flex-1" style="grid-template-columns: repeat(32, minmax(0, 1fr));" id="grid-floor"></div>
+            </div>
+
+            <!-- Row 5: Hi-Hat -->
+            <div class="flex items-center gap-1.5 min-w-[840px]">
+              <span class="w-24 text-cyan-400 font-bold shrink-0">📀 Hi-Hat</span>
+              <div class="grid gap-1 flex-1" style="grid-template-columns: repeat(32, minmax(0, 1fr));" id="grid-hihat"></div>
+            </div>
+
+            <!-- Row 6: Crash Cymbal -->
+            <div class="flex items-center gap-1.5 min-w-[840px]">
+              <span class="w-24 text-yellow-400 font-bold shrink-0">✨ Crash Cymbal</span>
+              <div class="grid gap-1 flex-1" style="grid-template-columns: repeat(32, minmax(0, 1fr));" id="grid-crash"></div>
+            </div>
+
+            <!-- Row 7: Fill-In Accent -->
+            <div class="flex items-center gap-1.5 min-w-[840px]">
+              <span class="w-24 text-purple-400 font-bold shrink-0">⚡ Fill-In</span>
+              <div class="grid gap-1 flex-1" style="grid-template-columns: repeat(32, minmax(0, 1fr));" id="grid-fill"></div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- Live Request Feed for Stage -->
-    <div id="stage-messages-feed" class="flex-1 custom-scroll space-y-4 pr-1"></div>
   </div>
 
   <!-- Modal Kelola Songlist -->
@@ -338,7 +450,6 @@
         <button onclick="toggleManageSongsModal()" class="text-stone-400 hover:text-white text-sm font-bold px-2">✕</button>
       </div>
 
-      <!-- Form Tambah Lagu -->
       <div class="space-y-2 mb-4 bg-stone-950 p-3 rounded-xl border border-stone-800">
         <p class="text-[11px] font-semibold text-amber-500 uppercase tracking-wider">Tambah Lagu Baru</p>
         <input type="text" id="new-song-title" placeholder="Judul Lagu..." class="w-full bg-stone-900 border border-stone-800 rounded-lg px-3 py-1.5 text-xs text-stone-200 outline-none focus:border-amber-600">
@@ -361,7 +472,6 @@
   </div>
 
   <script>
-    // Correct MD5 Hash for PIN "1208"
     const STAGE_PIN_HASH = "072b2a609d5069ebdfb9e830e84db890";
 
     // Songlist Data Initializer
@@ -381,78 +491,857 @@
     ];
 
     let currentCategory = 'all';
-    let mockMessages = [
-      { id: 1, sender: "Bento Kopi Jatinangor", text: "Selamat Datang di Monitor Panggung Kalajiva! Menunggu request lagu...", time: "Live" }
-    ];
+    let isStageAuthenticated = false;
+    let secretTapCount = 0;
+    let secretTapTimer = null;
+    let mockMessages = [];
 
     window.allLiveRequests = [...mockMessages];
 
-    // Web Audio Engine State
+    // ================= WEB AUDIO ACOUSTIC ENGINE =================
     let audioCtx = null;
+    let noiseBuffer = null;
+    let pinkNoiseBuffer = null;
+    let masterBus = null;
+    let roomConvolver = null;
     let isMetronomeRunning = false;
-    let metronomeBPM = 120;
+    let metronomeBPM = 108;
     let beatStep = 0;
     let timerId = null;
     let isFillInActive = false;
+    let tapTimes = [];
+    let tapResetTimer = null;
 
-    // 16-Step Patterns
+    // 32-Step / 8-Bar Helper (2 repetitions of 16-step pattern + optional Bar 8 fill)
+    const p32 = (arr16, fill16 = null) => [...arr16, ...(fill16 || arr16)];
+    const empty32 = () => Array(32).fill(false);
+
+    const defaultKick16  = [true, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false];
+    const defaultSnare16 = [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false];
+    const defaultHihat16 = [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false];
+    const defaultTom32   = [
+      false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+      false, false, false, false, false, false, false, false, false, false, false, false, false, true,  false, false
+    ];
+    const defaultFloor32 = [
+      false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+      false, false, false, false, false, false, false, false, false, false, false, false, false, false, true,  false
+    ];
+    const defaultCrash32 = [
+      true,  false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+      false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+    ];
+    const defaultFill32  = [
+      false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+      false, false, false, false, false, false, false, false, false, false, false, false, true,  true,  true,  true
+    ];
+
     let customPattern = {
-      kick:  [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false],
-      snare: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false],
-      hihat: [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false]
+      kick:  p32(defaultKick16),
+      snare: p32(defaultSnare16),
+      tom:   [...defaultTom32],
+      floor: [...defaultFloor32],
+      hihat: p32(defaultHihat16),
+      crash: [...defaultCrash32],
+      fill:  [...defaultFill32]
     };
 
     const stylePresets = {
-      funk: {
-        kick:  [true, false, false, true, false, false, true, false, false, true, false, false, true, false, false, false],
-        snare: [false, false, false, false, true, false, false, true, false, false, false, false, true, false, true, false],
-        hihat: [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
+      pop: {
+        bpm: 108,
+        kick:  p32([true, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false]),
+        snare: p32([false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false]),
+        tom:   [...defaultTom32],
+        floor: [...defaultFloor32],
+        hihat: p32([true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false]),
+        crash: [...defaultCrash32],
+        fill:  [...defaultFill32]
+      },
+      ballad: {
+        bpm: 74,
+        kick:  p32([true, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false]),
+        snare: p32([false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false]),
+        tom:   empty32(),
+        floor: [
+          false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+          false, false, false, false, false, false, false, false, false, false, false, false, false, false, true,  false
+        ],
+        hihat: p32([true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false]),
+        crash: [...defaultCrash32],
+        fill:  [
+          false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+          false, false, false, false, false, false, false, false, false, false, false, false, false, true,  true,  true
+        ]
       },
       jazz: {
-        kick:  [true, false, false, false, false, false, true, false, false, false, false, false, true, false, false, false],
-        snare: [false, false, false, false, true, false, false, false, false, false, true, false, false, false, true, false],
-        hihat: [true, false, true, true, false, true, true, false, true, true, false, true, true, false, true, true]
-      },
-      pop: {
-        kick:  [true, false, false, false, false, false, false, false, true, false, true, false, false, false, false, false],
-        snare: [false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false],
-        hihat: [true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false]
+        bpm: 118,
+        kick:  p32([true, false, false, false, false, false, false, false, true, false, false, false, false, false, false, false]),
+        snare: p32([false, false, false, false, true, false, false, true, false, false, false, false, true, false, false, false]),
+        tom:   p32([false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false]),
+        floor: empty32(),
+        hihat: p32([true, false, false, true, true, false, false, true, true, false, false, true, true, false, false, true]),
+        crash: [...defaultCrash32],
+        fill:  [...defaultFill32]
       },
       blues: {
-        kick:  [true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false],
-        snare: [false, false, true, false, true, false, false, true, false, false, true, false, true, false, false, true],
-        hihat: [true, false, true, true, false, true, true, false, true, true, false, true, true, false, true, true]
+        bpm: 92,
+        kick:  p32([true, false, false, true, false, false, false, false, true, false, false, true, false, false, false, false]),
+        snare: p32([false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, true]),
+        tom:   empty32(),
+        floor: p32([false, false, false, false, false, false, false, true, false, false, false, false, false, false, false, false]),
+        hihat: p32([true, false, false, true, true, false, false, true, true, false, false, true, true, false, false, true]),
+        crash: [...defaultCrash32],
+        fill:  [...defaultFill32]
+      },
+      reggae: {
+        bpm: 86,
+        kick:  p32([false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false]),
+        snare: p32([false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false]),
+        tom:   p32([false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false]),
+        floor: empty32(),
+        hihat: p32([false, false, true, false, false, false, true, false, false, false, true, false, false, false, true, false]),
+        crash: [...defaultCrash32],
+        fill:  [...defaultFill32]
+      },
+      rock: {
+        bpm: 132,
+        kick:  p32([true, false, false, false, false, false, true, false, true, false, true, false, false, false, false, false]),
+        snare: p32([false, false, false, false, true, false, false, false, false, false, false, false, true, false, false, false]),
+        tom:   [...defaultTom32],
+        floor: [...defaultFloor32],
+        hihat: p32([true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false]),
+        crash: [
+          true,  false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
+          true,  false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+        ],
+        fill:  [...defaultFill32]
       },
       bossa: {
-        kick:  [true, false, false, true, false, false, true, false, true, false, false, true, false, false, true, false],
-        snare: [false, false, true, false, false, true, false, false, false, false, true, false, false, true, false, false],
-        hihat: [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true]
+        bpm: 115,
+        kick:  p32([true, false, false, true, true, false, false, true, true, false, false, true, true, false, false, true]),
+        snare: p32([true, false, false, true, false, false, true, false, false, false, true, false, false, true, false, false]),
+        tom:   empty32(),
+        floor: p32([false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false]),
+        hihat: p32([true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false]),
+        crash: [...defaultCrash32],
+        fill:  [...defaultFill32]
+      },
+      cajon: {
+        bpm: 100,
+        kick:  p32([true, false, false, false, false, false, true, false, true, false, false, false, false, false, false, false]),
+        snare: p32([false, false, false, false, true, false, false, false, false, false, false, false, true, false, true, false]),
+        tom:   empty32(),
+        floor: empty32(),
+        hihat: p32([true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false]),
+        crash: empty32(),
+        fill:  [...defaultFill32]
       }
     };
+
+    // ================= STUDIO ACOUSTIC DRUM KIT SYNTHESIS =================
+
+    // Helper: Natural Human Micro-Variation so hits never sound robotic/electronic
+    function humanize(base, amount = 0.04) {
+      return base * (1 + (Math.random() * 2 - 1) * amount);
+    }
+
+    // Route dry + room ambience for realistic studio mic bleed
+    function connectDrumVoice(node, roomSendAmount = 0.22) {
+      if (!audioCtx || !masterBus) return;
+      node.connect(masterBus);
+      if (roomConvolver && roomSendAmount > 0) {
+        const sendGain = audioCtx.createGain();
+        sendGain.gain.value = roomSendAmount;
+        node.connect(sendGain);
+        sendGain.connect(roomConvolver);
+      }
+    }
+
+    // 1. 22" MAPLE ACOUSTIC BASS DRUM (Warm Air Thump + Wooden Beater Click + Room Low-End)
+    function playAcousticKick(time = audioCtx.currentTime, velocity = 1.0) {
+      if (!audioCtx || !noiseBuffer || !pinkNoiseBuffer) return;
+      const v = humanize(velocity, 0.05);
+
+      const voiceOut = audioCtx.createGain();
+      voiceOut.gain.value = 1.0;
+      connectDrumVoice(voiceOut, 0.14);
+
+      // 1A. Batter & Resonant Head Air Displacement (Organic Exponential Pitch Drop)
+      const shellOsc = audioCtx.createOscillator();
+      const shellFilter = audioCtx.createBiquadFilter();
+      const shellGain = audioCtx.createGain();
+
+      shellOsc.type = 'sine';
+      shellOsc.frequency.setValueAtTime(humanize(118, 0.03), time);
+      shellOsc.frequency.exponentialRampToValueAtTime(54, time + 0.042);
+      shellOsc.frequency.exponentialRampToValueAtTime(38, time + 0.26);
+
+      shellFilter.type = 'lowpass';
+      shellFilter.frequency.setValueAtTime(160, time);
+
+      shellGain.gain.setValueAtTime(0.001, time);
+      shellGain.gain.linearRampToValueAtTime(1.15 * v, time + 0.004);
+      shellGain.gain.exponentialRampToValueAtTime(0.28 * v, time + 0.09);
+      shellGain.gain.exponentialRampToValueAtTime(0.001, time + 0.30);
+
+      shellOsc.connect(shellFilter);
+      shellFilter.connect(shellGain);
+      shellGain.connect(voiceOut);
+
+      // 1B. Maple Shell Chest Punch (100-180 Hz warm wooden thud)
+      const chestNoise = audioCtx.createBufferSource();
+      chestNoise.buffer = pinkNoiseBuffer;
+      const chestFilter = audioCtx.createBiquadFilter();
+      chestFilter.type = 'bandpass';
+      chestFilter.frequency.setValueAtTime(125, time);
+      chestFilter.Q.value = 2.2;
+
+      const chestGain = audioCtx.createGain();
+      chestGain.gain.setValueAtTime(0.95 * v, time);
+      chestGain.gain.exponentialRampToValueAtTime(0.001, time + 0.085);
+
+      chestNoise.connect(chestFilter);
+      chestFilter.connect(chestGain);
+      chestGain.connect(voiceOut);
+
+      // 1C. Felt Beater Skin Slap (Short organic transient around 2.8 kHz)
+      const beaterNoise = audioCtx.createBufferSource();
+      beaterNoise.buffer = noiseBuffer;
+      const beaterFilter = audioCtx.createBiquadFilter();
+      beaterFilter.type = 'bandpass';
+      beaterFilter.frequency.setValueAtTime(humanize(2850, 0.06), time);
+      beaterFilter.Q.value = 1.6;
+
+      const beaterGain = audioCtx.createGain();
+      beaterGain.gain.setValueAtTime(0.42 * v, time);
+      beaterGain.gain.exponentialRampToValueAtTime(0.001, time + 0.014);
+
+      beaterNoise.connect(beaterFilter);
+      beaterFilter.connect(beaterGain);
+      beaterGain.connect(voiceOut);
+
+      shellOsc.start(time);
+      shellOsc.stop(time + 0.32);
+      chestNoise.start(time);
+      chestNoise.stop(time + 0.095);
+      beaterNoise.start(time);
+      beaterNoise.stop(time + 0.018);
+    }
+
+    // 2. 14" LUDWIG SUPRAPHONIC SNARE (Circular Membrane Modes + Real Brass Snare Wires)
+    function playAcousticSnare(time = audioCtx.currentTime, velocity = 1.0) {
+      if (!audioCtx || !noiseBuffer || !pinkNoiseBuffer) return;
+      const v = humanize(velocity, 0.06);
+
+      const voiceOut = audioCtx.createGain();
+      voiceOut.gain.value = 1.0;
+      connectDrumVoice(voiceOut, 0.34);
+
+      // 2A. Circular Drumhead Bessel Modes (1.0x, 1.59x, 2.14x ratios of real taut skin)
+      const f0 = humanize(186, 0.025);
+      const modes = [
+        { ratio: 1.00, amp: 0.58, decay: 0.11 },
+        { ratio: 1.59, amp: 0.28, decay: 0.075 },
+        { ratio: 2.14, amp: 0.14, decay: 0.045 }
+      ];
+
+      modes.forEach(m => {
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f0 * m.ratio * 1.18, time);
+        osc.frequency.exponentialRampToValueAtTime(f0 * m.ratio, time + 0.032);
+
+        g.gain.setValueAtTime(0.001, time);
+        g.gain.linearRampToValueAtTime(m.amp * v, time + 0.002);
+        g.gain.exponentialRampToValueAtTime(0.001, time + m.decay);
+
+        osc.connect(g);
+        g.connect(voiceOut);
+        osc.start(time);
+        osc.stop(time + m.decay + 0.01);
+      });
+
+      // 2B. Drumstick Rim/Head Crack Transient
+      const stickNoise = audioCtx.createBufferSource();
+      stickNoise.buffer = noiseBuffer;
+      const stickFilter = audioCtx.createBiquadFilter();
+      stickFilter.type = 'bandpass';
+      stickFilter.frequency.setValueAtTime(1650, time);
+      stickFilter.Q.value = 1.1;
+
+      const stickGain = audioCtx.createGain();
+      stickGain.gain.setValueAtTime(0.75 * v, time);
+      stickGain.gain.exponentialRampToValueAtTime(0.001, time + 0.024);
+
+      stickNoise.connect(stickFilter);
+      stickFilter.connect(stickGain);
+      stickGain.connect(voiceOut);
+      stickNoise.start(time);
+      stickNoise.stop(time + 0.03);
+
+      // 2C. Bottom Snare Wire Sizzle (Pink + White Noise sculpted like bottom SM57 mic)
+      const wireSource = audioCtx.createBufferSource();
+      wireSource.buffer = pinkNoiseBuffer;
+
+      const wireHp = audioCtx.createBiquadFilter();
+      wireHp.type = 'highpass';
+      wireHp.frequency.setValueAtTime(680, time);
+
+      const wireBody = audioCtx.createBiquadFilter();
+      wireBody.type = 'peaking';
+      wireBody.frequency.setValueAtTime(1950, time);
+      wireBody.Q.value = 0.9;
+      wireBody.gain.value = 6.5;
+
+      const wireAir = audioCtx.createBiquadFilter();
+      wireAir.type = 'highshelf';
+      wireAir.frequency.setValueAtTime(5500, time);
+      wireAir.gain.value = 5.0;
+
+      const wireGain = audioCtx.createGain();
+      wireGain.gain.setValueAtTime(0.001, time);
+      wireGain.gain.linearRampToValueAtTime(1.15 * v, time + 0.005);
+      wireGain.gain.exponentialRampToValueAtTime(0.24 * v, time + 0.075);
+      wireGain.gain.exponentialRampToValueAtTime(0.001, time + 0.24);
+
+      wireSource.connect(wireHp);
+      wireHp.connect(wireBody);
+      wireBody.connect(wireAir);
+      wireAir.connect(wireGain);
+      wireGain.connect(voiceOut);
+
+      wireSource.start(time);
+      wireSource.stop(time + 0.25);
+    }
+
+    // 3. WOODEN CAJON BASS & SLAP (For Unplugged Mode)
+    function playCajonBass(time = audioCtx.currentTime, velocity = 1.0) {
+      if (!audioCtx || !pinkNoiseBuffer) return;
+      const v = humanize(velocity, 0.05);
+      const voiceOut = audioCtx.createGain();
+      connectDrumVoice(voiceOut, 0.20);
+
+      const osc = audioCtx.createOscillator();
+      const filter = audioCtx.createBiquadFilter();
+      const gain = audioCtx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(145, time);
+      osc.frequency.exponentialRampToValueAtTime(68, time + 0.06);
+      osc.frequency.exponentialRampToValueAtTime(54, time + 0.18);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(260, time);
+
+      gain.gain.setValueAtTime(0.95 * v, time);
+      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.20);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(voiceOut);
+
+      // Birchwood palm thump
+      const palm = audioCtx.createBufferSource();
+      palm.buffer = pinkNoiseBuffer;
+      const palmFilter = audioCtx.createBiquadFilter();
+      palmFilter.type = 'bandpass';
+      palmFilter.frequency.setValueAtTime(220, time);
+      palmFilter.Q.value = 1.8;
+      const palmGain = audioCtx.createGain();
+      palmGain.gain.setValueAtTime(0.65 * v, time);
+      palmGain.gain.exponentialRampToValueAtTime(0.001, time + 0.055);
+
+      palm.connect(palmFilter);
+      palmFilter.connect(palmGain);
+      palmGain.connect(voiceOut);
+
+      osc.start(time);
+      osc.stop(time + 0.21);
+      palm.start(time);
+      palm.stop(time + 0.06);
+    }
+
+    function playCajonSlap(time = audioCtx.currentTime, velocity = 1.0) {
+      if (!audioCtx || !noiseBuffer || !pinkNoiseBuffer) return;
+      const v = humanize(velocity, 0.05);
+      const voiceOut = audioCtx.createGain();
+      connectDrumVoice(voiceOut, 0.24);
+
+      const woodOsc = audioCtx.createOscillator();
+      const woodGain = audioCtx.createGain();
+      woodOsc.type = 'sine';
+      woodOsc.frequency.setValueAtTime(240, time);
+      woodOsc.frequency.exponentialRampToValueAtTime(135, time + 0.045);
+      woodGain.gain.setValueAtTime(0.45 * v, time);
+      woodGain.gain.exponentialRampToValueAtTime(0.001, time + 0.06);
+
+      woodOsc.connect(woodGain);
+      woodGain.connect(voiceOut);
+      woodOsc.start(time);
+      woodOsc.stop(time + 0.065);
+
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = pinkNoiseBuffer;
+      const bandpass = audioCtx.createBiquadFilter();
+      bandpass.type = 'bandpass';
+      bandpass.frequency.setValueAtTime(1850, time);
+      bandpass.Q.value = 1.1;
+
+      const noiseGain = audioCtx.createGain();
+      noiseGain.gain.setValueAtTime(0.75 * v, time);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.11);
+
+      noise.connect(bandpass);
+      bandpass.connect(noiseGain);
+      noiseGain.connect(voiceOut);
+
+      noise.start(time);
+      noise.stop(time + 0.12);
+    }
+
+    // 4. 12" MAPLE RACK TOM-TOM (Circular Drumhead Harmonics + Warm Shell Resonance)
+    function playAcousticTom(time = audioCtx.currentTime, velocity = 1.0) {
+      if (!audioCtx || !noiseBuffer || !pinkNoiseBuffer) return;
+      const v = humanize(velocity, 0.05);
+      const voiceOut = audioCtx.createGain();
+      connectDrumVoice(voiceOut, 0.30);
+
+      // Natural circular membrane modes (1.0x fundamental + 1.59x first overtone)
+      const f0 = humanize(138, 0.025);
+      const headOsc = audioCtx.createOscillator();
+      const headGain = audioCtx.createGain();
+      headOsc.type = 'sine';
+      headOsc.frequency.setValueAtTime(f0 * 1.48, time);
+      headOsc.frequency.exponentialRampToValueAtTime(f0 * 1.06, time + 0.055);
+      headOsc.frequency.exponentialRampToValueAtTime(f0 * 0.94, time + 0.36);
+
+      headGain.gain.setValueAtTime(0.001, time);
+      headGain.gain.linearRampToValueAtTime(0.92 * v, time + 0.003);
+      headGain.gain.exponentialRampToValueAtTime(0.001, time + 0.38);
+
+      const overOsc = audioCtx.createOscillator();
+      const overGain = audioCtx.createGain();
+      overOsc.type = 'sine';
+      overOsc.frequency.setValueAtTime(f0 * 1.59 * 1.35, time);
+      overOsc.frequency.exponentialRampToValueAtTime(f0 * 1.59, time + 0.08);
+
+      overGain.gain.setValueAtTime(0.32 * v, time);
+      overGain.gain.exponentialRampToValueAtTime(0.001, time + 0.16);
+
+      // Warm maple shell air puff
+      const shellAir = audioCtx.createBufferSource();
+      shellAir.buffer = pinkNoiseBuffer;
+      const shellFilter = audioCtx.createBiquadFilter();
+      shellFilter.type = 'bandpass';
+      shellFilter.frequency.setValueAtTime(290, time);
+      shellFilter.Q.value = 1.8;
+
+      const shellGain = audioCtx.createGain();
+      shellGain.gain.setValueAtTime(0.55 * v, time);
+      shellGain.gain.exponentialRampToValueAtTime(0.001, time + 0.09);
+
+      // Hickory drumstick attack on coated Mylar head
+      const stickNoise = audioCtx.createBufferSource();
+      stickNoise.buffer = noiseBuffer;
+      const stickFilter = audioCtx.createBiquadFilter();
+      stickFilter.type = 'bandpass';
+      stickFilter.frequency.setValueAtTime(1850, time);
+      stickFilter.Q.value = 1.5;
+
+      const stickGain = audioCtx.createGain();
+      stickGain.gain.setValueAtTime(0.45 * v, time);
+      stickGain.gain.exponentialRampToValueAtTime(0.001, time + 0.018);
+
+      headOsc.connect(headGain);
+      headGain.connect(voiceOut);
+      overOsc.connect(overGain);
+      overGain.connect(voiceOut);
+      shellAir.connect(shellFilter);
+      shellFilter.connect(shellGain);
+      shellGain.connect(voiceOut);
+      stickNoise.connect(stickFilter);
+      stickFilter.connect(stickGain);
+      stickGain.connect(voiceOut);
+
+      headOsc.start(time);
+      headOsc.stop(time + 0.40);
+      overOsc.start(time);
+      overOsc.stop(time + 0.18);
+      shellAir.start(time);
+      shellAir.stop(time + 0.10);
+      stickNoise.start(time);
+      stickNoise.stop(time + 0.022);
+    }
+
+    // 5. 16" MAPLE FLOOR TOM (Deep Acoustic Low-End Sustain + Coated Head Attack)
+    function playAcousticFloorTom(time = audioCtx.currentTime, velocity = 1.0) {
+      if (!audioCtx || !noiseBuffer || !pinkNoiseBuffer) return;
+      const v = humanize(velocity, 0.05);
+      const voiceOut = audioCtx.createGain();
+      connectDrumVoice(voiceOut, 0.32);
+
+      const f0 = humanize(88, 0.025);
+      const floorOsc = audioCtx.createOscillator();
+      const floorGain = audioCtx.createGain();
+      floorOsc.type = 'sine';
+      floorOsc.frequency.setValueAtTime(f0 * 1.52, time);
+      floorOsc.frequency.exponentialRampToValueAtTime(f0 * 1.04, time + 0.075);
+      floorOsc.frequency.exponentialRampToValueAtTime(f0 * 0.91, time + 0.48);
+
+      floorGain.gain.setValueAtTime(0.001, time);
+      floorGain.gain.linearRampToValueAtTime(1.05 * v, time + 0.004);
+      floorGain.gain.exponentialRampToValueAtTime(0.001, time + 0.52);
+
+      // First circular membrane overtone (1.59x)
+      const overOsc = audioCtx.createOscillator();
+      const overGain = audioCtx.createGain();
+      overOsc.type = 'sine';
+      overOsc.frequency.setValueAtTime(f0 * 1.59 * 1.32, time);
+      overOsc.frequency.exponentialRampToValueAtTime(f0 * 1.59, time + 0.11);
+
+      overGain.gain.setValueAtTime(0.36 * v, time);
+      overGain.gain.exponentialRampToValueAtTime(0.001, time + 0.22);
+
+      // Deep shell cavity breath
+      const shellAir = audioCtx.createBufferSource();
+      shellAir.buffer = pinkNoiseBuffer;
+      const shellFilter = audioCtx.createBiquadFilter();
+      shellFilter.type = 'bandpass';
+      shellFilter.frequency.setValueAtTime(185, time);
+      shellFilter.Q.value = 1.8;
+
+      const shellGain = audioCtx.createGain();
+      shellGain.gain.setValueAtTime(0.65 * v, time);
+      shellGain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+
+      // Stick impact on coated head
+      const stickNoise = audioCtx.createBufferSource();
+      stickNoise.buffer = noiseBuffer;
+      const stickFilter = audioCtx.createBiquadFilter();
+      stickFilter.type = 'bandpass';
+      stickFilter.frequency.setValueAtTime(1450, time);
+      stickFilter.Q.value = 1.4;
+
+      const stickGain = audioCtx.createGain();
+      stickGain.gain.setValueAtTime(0.45 * v, time);
+      stickGain.gain.exponentialRampToValueAtTime(0.001, time + 0.02);
+
+      floorOsc.connect(floorGain);
+      floorGain.connect(voiceOut);
+      overOsc.connect(overGain);
+      overGain.connect(voiceOut);
+      shellAir.connect(shellFilter);
+      shellFilter.connect(shellGain);
+      shellGain.connect(voiceOut);
+      stickNoise.connect(stickFilter);
+      stickFilter.connect(stickGain);
+      stickGain.connect(voiceOut);
+
+      floorOsc.start(time);
+      floorOsc.stop(time + 0.54);
+      overOsc.start(time);
+      overOsc.stop(time + 0.24);
+      shellAir.start(time);
+      shellAir.stop(time + 0.13);
+      stickNoise.start(time);
+      stickNoise.stop(time + 0.024);
+    }
+
+    // 6. 14" ZILDJIAN K-STYLE HI-HAT (Organic Band-Sculpted Bronze Noise + Subtle Shimmer)
+    function playAcousticHiHat(time = audioCtx.currentTime, isOpen = false, velocity = 1.0) {
+      if (!audioCtx || !noiseBuffer) return;
+      const v = humanize(velocity, 0.08);
+      const duration = isOpen ? 0.36 : 0.048;
+
+      const voiceOut = audioCtx.createGain();
+      connectDrumVoice(voiceOut, isOpen ? 0.35 : 0.18);
+
+      // Pure sculpted noise (eliminates robotic square-wave buzzing)
+      const src = audioCtx.createBufferSource();
+      src.buffer = noiseBuffer;
+
+      const hp = audioCtx.createBiquadFilter();
+      hp.type = 'highpass';
+      hp.frequency.setValueAtTime(6400, time);
+
+      const bronzeResonance = audioCtx.createBiquadFilter();
+      bronzeResonance.type = 'peaking';
+      bronzeResonance.frequency.setValueAtTime(humanize(9600, 0.04), time);
+      bronzeResonance.Q.value = 2.2;
+      bronzeResonance.gain.value = 6.5;
+
+      const lp = audioCtx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(14500, time);
+
+      const gain = audioCtx.createGain();
+      const peakGain = (isOpen ? 0.34 : 0.28) * v;
+      gain.gain.setValueAtTime(0.001, time);
+      gain.gain.linearRampToValueAtTime(peakGain, time + 0.002);
+      gain.gain.exponentialRampToValueAtTime(0.0008, time + duration);
+
+      // Subtle bronze bell ping (very low sine FM pair for realism, no harsh square waves)
+      const bell = audioCtx.createOscillator();
+      const bellGain = audioCtx.createGain();
+      bell.type = 'sine';
+      bell.frequency.setValueAtTime(humanize(7250, 0.03), time);
+      bellGain.gain.setValueAtTime(0.022 * v, time);
+      bellGain.gain.exponentialRampToValueAtTime(0.0001, time + duration * 0.7);
+
+      src.connect(hp);
+      hp.connect(bronzeResonance);
+      bronzeResonance.connect(lp);
+      lp.connect(gain);
+      gain.connect(voiceOut);
+
+      bell.connect(bellGain);
+      bellGain.connect(voiceOut);
+
+      src.start(time);
+      src.stop(time + duration + 0.02);
+      bell.start(time);
+      bell.stop(time + duration + 0.02);
+    }
+
+    // 7. 18" HAND-HAMMERED THIN CRASH CYMBAL (Multi-Band Bronze Wash + Sweeping Filter Decay)
+    function playAcousticCrash(time = audioCtx.currentTime, velocity = 1.0) {
+      if (!audioCtx || !noiseBuffer || !pinkNoiseBuffer) return;
+      const v = humanize(velocity, 0.05);
+      const duration = 1.65;
+
+      const voiceOut = audioCtx.createGain();
+      connectDrumVoice(voiceOut, 0.45);
+
+      // Layer A: Main B20 Bronze Shimmer Wash (sweeps down naturally as cymbal loses energy)
+      const washSrc = audioCtx.createBufferSource();
+      washSrc.buffer = noiseBuffer;
+
+      const hp = audioCtx.createBiquadFilter();
+      hp.type = 'highpass';
+      hp.frequency.setValueAtTime(3200, time);
+
+      const peak1 = audioCtx.createBiquadFilter();
+      peak1.type = 'peaking';
+      peak1.frequency.setValueAtTime(5400, time);
+      peak1.Q.value = 1.4;
+      peak1.gain.value = 5.5;
+
+      const peak2 = audioCtx.createBiquadFilter();
+      peak2.type = 'peaking';
+      peak2.frequency.setValueAtTime(8900, time);
+      peak2.Q.value = 1.8;
+      peak2.gain.value = 4.5;
+
+      // Dynamic high-frequency damping as cymbal cools down
+      const dampLp = audioCtx.createBiquadFilter();
+      dampLp.type = 'lowpass';
+      dampLp.frequency.setValueAtTime(15000, time);
+      dampLp.frequency.exponentialRampToValueAtTime(4800, time + duration);
+
+      const washGain = audioCtx.createGain();
+      washGain.gain.setValueAtTime(0.001, time);
+      washGain.gain.linearRampToValueAtTime(0.46 * v, time + 0.008);
+      washGain.gain.exponentialRampToValueAtTime(0.18 * v, time + 0.25);
+      washGain.gain.exponentialRampToValueAtTime(0.0006, time + duration);
+
+      washSrc.connect(hp);
+      hp.connect(peak1);
+      peak1.connect(peak2);
+      peak2.connect(dampLp);
+      dampLp.connect(washGain);
+      washGain.connect(voiceOut);
+
+      // Layer B: Warm Bronze Body & Stick Edge Attack (1.2kHz - 3.5kHz)
+      const bodySrc = audioCtx.createBufferSource();
+      bodySrc.buffer = pinkNoiseBuffer;
+      const bodyBp = audioCtx.createBiquadFilter();
+      bodyBp.type = 'bandpass';
+      bodyBp.frequency.setValueAtTime(2150, time);
+      bodyBp.Q.value = 1.1;
+
+      const bodyGain = audioCtx.createGain();
+      bodyGain.gain.setValueAtTime(0.38 * v, time);
+      bodyGain.gain.exponentialRampToValueAtTime(0.0008, time + 0.65);
+
+      bodySrc.connect(bodyBp);
+      bodyBp.connect(bodyGain);
+      bodyGain.connect(voiceOut);
+
+      washSrc.start(time);
+      washSrc.stop(time + duration + 0.05);
+      bodySrc.start(time);
+      bodySrc.stop(time + 0.70);
+    }
+
+    // 8. FULL DRUM KIT FILL-IN (Snare -> Rack Tom -> Floor Tom -> Bass Drum + Crash Cymbal)
+    function playAcousticFill(time = audioCtx.currentTime) {
+      if (!audioCtx) return;
+      playAcousticSnare(time, 0.85);
+      playAcousticTom(time + 0.09, 0.92);
+      playAcousticTom(time + 0.18, 0.98);
+      playAcousticFloorTom(time + 0.27, 1.05);
+      playAcousticKick(time + 0.37, 1.1);
+      playAcousticCrash(time + 0.37, 1.1);
+    }
 
     function initAudioContext() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const sampleRate = audioCtx.sampleRate;
+        const bufferSize = sampleRate * 2.0;
+
+        // 1. White Noise Buffer
+        noiseBuffer = audioCtx.createBuffer(1, bufferSize, sampleRate);
+        const whiteData = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          whiteData[i] = Math.random() * 2 - 1;
+        }
+
+        // 2. Paul Kellet Pink Noise Buffer (Natural Warm Acoustic Spectrum)
+        pinkNoiseBuffer = audioCtx.createBuffer(1, bufferSize, sampleRate);
+        const pinkData = pinkNoiseBuffer.getChannelData(0);
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          pinkData[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.05;
+          b6 = white * 0.115926;
+        }
+
+        // 3. Acoustic Studio Room Impulse Response (Natural Live Room Ambience)
+        const roomDuration = 0.42;
+        const roomLength = Math.floor(sampleRate * roomDuration);
+        const impulse = audioCtx.createBuffer(2, roomLength, sampleRate);
+        for (let ch = 0; ch < 2; ch++) {
+          const chData = impulse.getChannelData(ch);
+          for (let i = 0; i < roomLength; i++) {
+            const decay = Math.pow(1 - i / roomLength, 2.8);
+            chData[i] = (Math.random() * 2 - 1) * decay * 0.45;
+          }
+        }
+        roomConvolver = audioCtx.createConvolver();
+        roomConvolver.buffer = impulse;
+
+        // 4. Studio Bus Compressor (Glues drum kit hits together naturally)
+        masterBus = audioCtx.createDynamicsCompressor();
+        masterBus.threshold.setValueAtTime(-14, audioCtx.currentTime);
+        masterBus.knee.setValueAtTime(12, audioCtx.currentTime);
+        masterBus.ratio.setValueAtTime(3.2, audioCtx.currentTime);
+        masterBus.attack.setValueAtTime(0.008, audioCtx.currentTime);
+        masterBus.release.setValueAtTime(0.14, audioCtx.currentTime);
+
+        const roomReturnFilter = audioCtx.createBiquadFilter();
+        roomReturnFilter.type = 'lowpass';
+        roomReturnFilter.frequency.setValueAtTime(4200, audioCtx.currentTime);
+
+        roomConvolver.connect(roomReturnFilter);
+        roomReturnFilter.connect(masterBus);
+        masterBus.connect(audioCtx.destination);
       }
       if (audioCtx.state === 'suspended') {
         audioCtx.resume();
       }
     }
 
-    // UI & Grid Builders
+    // ================= TAP TEMPO LOGIC =================
+    window.handleTapTempo = function() {
+      initAudioContext();
+      const now = performance.now();
+      const tapBtn = document.getElementById('tap-tempo-btn');
+      const tapStatus = document.getElementById('tap-status');
+
+      if (tapBtn) {
+        tapBtn.classList.remove('pad-hit');
+        void tapBtn.offsetWidth;
+        tapBtn.classList.add('pad-hit');
+      }
+
+      if (tapTimes.length > 0 && now - tapTimes[tapTimes.length - 1] > 2000) {
+        tapTimes = [];
+      }
+
+      tapTimes.push(now);
+      if (tapTimes.length > 6) {
+        tapTimes.shift();
+      }
+
+      playAcousticSnare(audioCtx.currentTime, 0.25);
+
+      if (tapTimes.length >= 2) {
+        let totalDiff = 0;
+        for (let i = 1; i < tapTimes.length; i++) {
+          totalDiff += (tapTimes[i] - tapTimes[i - 1]);
+        }
+        const avgMs = totalDiff / (tapTimes.length - 1);
+        const calculatedBPM = Math.min(220, Math.max(40, Math.round(60000 / avgMs)));
+
+        if (tapStatus) tapStatus.innerText = `${tapTimes.length} ketukan`;
+        updateBPM(calculatedBPM);
+      } else {
+        if (tapStatus) tapStatus.innerText = "Ketuk lagi...";
+      }
+
+      clearTimeout(tapResetTimer);
+      tapResetTimer = setTimeout(() => {
+        tapTimes = [];
+        if (tapStatus) tapStatus.innerText = "Ketuk ketukan";
+      }, 2200);
+    };
+
+    window.adjustBPM = function(delta) {
+      const next = Math.min(220, Math.max(40, metronomeBPM + delta));
+      updateBPM(next);
+    };
+
+    window.updateBPM = function(val) {
+      metronomeBPM = parseInt(val, 10);
+      const bpmDisp = document.getElementById('bpm-display');
+      const slider = document.getElementById('bpm-slider');
+      if (bpmDisp) bpmDisp.innerText = `${metronomeBPM} BPM`;
+      if (slider) slider.value = metronomeBPM;
+
+      if (isMetronomeRunning) {
+        stopMetronome();
+        startMetronome();
+      }
+    };
+
+    // ================= 32-STEP GRID BUILDER =================
     function build16StepGrid() {
-      const types = ['kick', 'snare', 'hihat'];
-      types.forEach(type => {
-        const container = document.getElementById(`grid-${type}`);
+      const rows = [
+        { key: 'kick',  activeClass: 'bg-rose-500 text-white shadow-sm shadow-rose-500/40' },
+        { key: 'snare', activeClass: 'bg-emerald-500 text-stone-950 shadow-sm shadow-emerald-500/40' },
+        { key: 'tom',   activeClass: 'bg-orange-500 text-white shadow-sm shadow-orange-500/40' },
+        { key: 'floor', activeClass: 'bg-indigo-500 text-white shadow-sm shadow-indigo-500/40' },
+        { key: 'hihat', activeClass: 'bg-cyan-400 text-stone-950 shadow-sm shadow-cyan-400/40' },
+        { key: 'crash', activeClass: 'bg-yellow-400 text-stone-950 shadow-sm shadow-yellow-400/40' },
+        { key: 'fill',  activeClass: 'bg-purple-500 text-white shadow-sm shadow-purple-500/40' }
+      ];
+
+      rows.forEach(row => {
+        const container = document.getElementById(`grid-${row.key}`);
         if (!container) return;
         container.innerHTML = '';
-        for (let i = 0; i < 16; i++) {
+
+        for (let i = 0; i < 32; i++) {
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.id = `step-${type}-${i}`;
-          btn.onclick = () => toggleGridBeat(type, i);
-          btn.className = `flex-1 py-1 text-[9px] rounded font-bold transition ${
-            customPattern[type][i] ? 'bg-amber-500 text-black' : 'bg-stone-900 text-stone-500 border border-stone-800'
+          btn.id = `step-${row.key}-${i}`;
+          btn.onclick = () => toggleGridBeat(row.key, i);
+
+          const isBarStart = i % 4 === 0;
+          const isActive = customPattern[row.key][i];
+
+          btn.className = `py-1.5 text-[9px] rounded font-extrabold transition ${
+            isActive
+              ? row.activeClass
+              : (isBarStart ? 'bg-stone-800/90 text-stone-300 border border-stone-700' : 'bg-stone-900 text-stone-500 border border-stone-800/80')
           }`;
           btn.innerText = (i + 1).toString();
           container.appendChild(btn);
@@ -467,23 +1356,48 @@
       build16StepGrid();
     }
 
-    function changeBeatStyle(styleKey) {
-      if (stylePresets[styleKey]) {
-        customPattern = JSON.parse(JSON.stringify(stylePresets[styleKey]));
-        build16StepGrid();
-      }
-    }
+    window.clearCustomPattern = function() {
+      customPattern = {
+        kick:  Array(32).fill(false),
+        snare: Array(32).fill(false),
+        tom:   Array(32).fill(false),
+        floor: Array(32).fill(false),
+        hihat: Array(32).fill(false),
+        crash: Array(32).fill(false),
+        fill:  Array(32).fill(false)
+      };
+      const select = document.getElementById('beat-sound-select');
+      if (select) select.value = 'custom';
+      build16StepGrid();
+    };
 
-    window.updateBPM = function(val) {
-      metronomeBPM = parseInt(val, 10);
-      const bpmDisp = document.getElementById('bpm-display');
-      if (bpmDisp) bpmDisp.innerText = `${metronomeBPM} BPM`;
-      if (isMetronomeRunning) {
-        stopMetronome();
-        startMetronome();
+    window.changeBeatStyle = function(styleKey) {
+      const kickRowLabel = document.getElementById('label-row-kick');
+      const snareRowLabel = document.getElementById('label-row-snare');
+      if (kickRowLabel) {
+        kickRowLabel.innerText = styleKey === 'cajon' ? '📦 Cajon Bass' : '🥁 Bass Drum';
+      }
+      if (snareRowLabel) {
+        snareRowLabel.innerText = styleKey === 'cajon' ? '✋ Cajon Slap' : '🪘 Snare Drum';
+      }
+
+      if (stylePresets[styleKey]) {
+        const preset = stylePresets[styleKey];
+        customPattern = {
+          kick:  [...preset.kick],
+          snare: [...preset.snare],
+          tom:   [...preset.tom],
+          floor: [...preset.floor],
+          hihat: [...preset.hihat],
+          crash: [...preset.crash],
+          fill:  [...preset.fill]
+        };
+        build16StepGrid();
+        updateBPM(preset.bpm);
       }
     };
 
+    // ================= RHYTHM PLAYBACK ENGINE =================
     window.toggleMetronome = function() {
       initAudioContext();
       if (isMetronomeRunning) {
@@ -498,8 +1412,8 @@
       beatStep = 0;
       const btn = document.getElementById('metronome-btn');
       if (btn) {
-        btn.innerHTML = '⏹ STOP RHYTHM';
-        btn.className = 'w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs tracking-wider transition shadow-md flex items-center justify-center gap-2';
+        btn.innerHTML = '⏹ STOP';
+        btn.className = 'flex-1 py-2.5 px-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs tracking-wider transition shadow-md flex items-center justify-center gap-1.5';
       }
 
       const intervalMs = (60 / metronomeBPM / 4) * 1000;
@@ -512,178 +1426,182 @@
       if (timerId) clearInterval(timerId);
       const btn = document.getElementById('metronome-btn');
       if (btn) {
-        btn.innerHTML = '▶ START RHYTHM';
-        btn.className = 'w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-bold text-xs tracking-wider transition shadow-md flex items-center justify-center gap-2';
+        btn.innerHTML = '▶ PLAY';
+        btn.className = 'flex-1 py-2.5 px-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-stone-950 font-black text-xs tracking-wider transition shadow-md flex items-center justify-center gap-1.5';
       }
+      for (let b = 0; b < 4; b++) {
+        const led = document.getElementById(`beat-led-${b}`);
+        if (led) led.className = 'w-2.5 h-2.5 rounded-full bg-stone-700 transition-all';
+      }
+      ['kick', 'snare', 'tom', 'floor', 'hihat', 'crash', 'fill'].forEach(type => {
+        for (let i = 0; i < 32; i++) {
+          const cell = document.getElementById(`step-${type}-${i}`);
+          if (cell) cell.classList.remove('ring-2', 'ring-white', 'scale-105');
+        }
+      });
     }
 
     function playRhythmTick() {
       if (!audioCtx) return;
-      const soundType = document.getElementById('beat-sound-select')?.value || 'click';
+      const soundType = document.getElementById('beat-sound-select')?.value || 'pop';
       const now = audioCtx.currentTime;
 
-      // Update Visual Steps Indicator
-      ['kick', 'snare', 'hihat'].forEach(type => {
-        for (let i = 0; i < 16; i++) {
-          const btn = document.getElementById(`step-${type}-${i}`);
-          if (btn) {
+      const currentQuarterBeat = Math.floor((beatStep % 16) / 4);
+      for (let b = 0; b < 4; b++) {
+        const led = document.getElementById(`beat-led-${b}`);
+        if (led) {
+          if (b === currentQuarterBeat && beatStep % 4 === 0) {
+            led.className = b === 0
+              ? 'w-3 h-3 rounded-full bg-amber-400 shadow-md shadow-amber-400 transition-all'
+              : 'w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400 transition-all';
+          } else if (b === currentQuarterBeat) {
+            led.className = 'w-2.5 h-2.5 rounded-full bg-amber-500/50 transition-all';
+          } else {
+            led.className = 'w-2.5 h-2.5 rounded-full bg-stone-800 transition-all';
+          }
+        }
+      }
+
+      ['kick', 'snare', 'tom', 'floor', 'hihat', 'crash', 'fill'].forEach(type => {
+        for (let i = 0; i < 32; i++) {
+          const cell = document.getElementById(`step-${type}-${i}`);
+          if (cell) {
             if (i === beatStep) {
-              btn.classList.add('ring-2', 'ring-white', 'scale-105');
+              cell.classList.add('ring-2', 'ring-white', 'scale-105');
             } else {
-              btn.classList.remove('ring-2', 'ring-white', 'scale-105');
+              cell.classList.remove('ring-2', 'ring-white', 'scale-105');
             }
           }
         }
       });
 
-      // Handle Fill-In Execution
-      if (isFillInActive) {
-        if (beatStep >= 12) {
-          // Play energetic drum fill on the last 4 beats of the bar
-          if (beatStep === 12 || beatStep === 14) playSynthKick(now);
-          playSynthSnare(now);
-          if (beatStep === 15) {
-            playSynthHiHat(now);
-            isFillInActive = false; // Reset fill after section completes
-          }
-        } else {
-          executeStandardBeat(soundType, now);
-        }
-      } else {
-        executeStandardBeat(soundType, now);
-      }
-
-      beatStep = (beatStep + 1) % 16;
-    }
-
-    function executeStandardBeat(soundType, now) {
       if (soundType === 'click') {
         if (beatStep % 4 === 0) {
           const osc = audioCtx.createOscillator();
           const gain = audioCtx.createGain();
-          osc.frequency.value = beatStep === 0 ? 1200 : 800;
-          gain.gain.setValueAtTime(0.4, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          osc.type = 'sine';
+          osc.frequency.value = (beatStep === 0 || beatStep === 16) ? 1150 : 780;
+          gain.gain.setValueAtTime(0.45, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.045);
           osc.connect(gain);
           gain.connect(audioCtx.destination);
           osc.start(now);
           osc.stop(now + 0.05);
         }
-      } else if (soundType === 'cajon') {
-        if (beatStep === 0 || beatStep === 8) playSynthKick(now);
-        else if (beatStep === 4 || beatStep === 12) playSynthSnare(now);
-        else if (beatStep % 2 === 0) playSynthHiHat(now);
       } else {
-        if (customPattern.kick[beatStep]) playSynthKick(now);
-        if (customPattern.snare[beatStep]) playSynthSnare(now);
-        if (customPattern.hihat[beatStep]) playSynthHiHat(now);
+        const isManualFillStep = isFillInActive && ((beatStep >= 28 && beatStep < 32) || (beatStep >= 12 && beatStep < 16));
+        const isGridFillStep = customPattern.fill[beatStep];
+
+        if (isManualFillStep || isGridFillStep) {
+          const mod4 = beatStep % 4;
+          if (mod4 === 0) playAcousticSnare(now, 0.9);
+          else if (mod4 === 1) playAcousticTom(now, 0.95);
+          else if (mod4 === 2) playAcousticFloorTom(now, 1.0);
+          else if (mod4 === 3) {
+            playAcousticFloorTom(now, 1.05);
+            playAcousticCrash(now, 1.1);
+            isFillInActive = false;
+          }
+        } else {
+          if (customPattern.kick[beatStep]) {
+            soundType === 'cajon' ? playCajonBass(now, 1.0) : playAcousticKick(now, 1.0);
+          }
+          if (customPattern.snare[beatStep]) {
+            soundType === 'cajon' ? playCajonSlap(now, 0.95) : playAcousticSnare(now, 0.95);
+          }
+          if (customPattern.tom[beatStep]) {
+            playAcousticTom(now, 0.95);
+          }
+          if (customPattern.floor[beatStep]) {
+            playAcousticFloorTom(now, 1.0);
+          }
+          if (customPattern.hihat[beatStep]) {
+            const isOpen = (soundType === 'reggae' && (beatStep % 4 === 2));
+            const vel = (beatStep % 2 === 0) ? 0.95 : 0.65;
+            playAcousticHiHat(now, isOpen, vel);
+          }
+          if (customPattern.crash[beatStep]) {
+            playAcousticCrash(now, 1.0);
+          }
+        }
       }
+
+      beatStep = (beatStep + 1) % 32;
     }
 
-    // Dynamic Acoustic Sound Synthesis (Low Acoustic Kick & Snare Tuning)
-    function playSynthKick(time = audioCtx ? audioCtx.currentTime : 0) {
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      
-      // Low sub-kick sweep tuned for rich acoustic warmth
-      osc.frequency.setValueAtTime(110, time);
-      osc.frequency.exponentialRampToValueAtTime(25, time + 0.16);
-      
-      gain.gain.setValueAtTime(0.9, time);
-      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.18);
-      
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(time);
-      osc.stop(time + 0.18);
-    }
-
-    function playSynthSnare(time = audioCtx ? audioCtx.currentTime : 0) {
-      if (!audioCtx) return;
-      
-      // Layer 1: Warm Low Shell Body Pitch Sweep
-      const bodyOsc = audioCtx.createOscillator();
-      const bodyGain = audioCtx.createGain();
-      bodyOsc.type = 'triangle';
-      bodyOsc.frequency.setValueAtTime(130, time);
-      bodyOsc.frequency.exponentialRampToValueAtTime(55, time + 0.14);
-      
-      bodyGain.gain.setValueAtTime(0.7, time);
-      bodyGain.gain.exponentialRampToValueAtTime(0.001, time + 0.15);
-      
-      bodyOsc.connect(bodyGain);
-      bodyGain.connect(audioCtx.destination);
-      bodyOsc.start(time);
-      bodyOsc.stop(time + 0.15);
-
-      // Layer 2: Snare Wires Noise Snap
-      const bufferSize = audioCtx.sampleRate * 0.12;
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
-      
-      const noise = audioCtx.createBufferSource();
-      noise.buffer = buffer;
-
-      const noiseFilter = audioCtx.createBiquadFilter();
-      noiseFilter.type = 'highpass';
-      noiseFilter.frequency.value = 800; // Warm snare wire tone
-
-      const noiseGain = audioCtx.createGain();
-      noiseGain.gain.setValueAtTime(0.35, time);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
-
-      noise.connect(noiseFilter);
-      noiseFilter.connect(noiseGain);
-      noiseGain.connect(audioCtx.destination);
-
-      noise.start(time);
-    }
-
-    function playSynthHiHat(time = audioCtx ? audioCtx.currentTime : 0) {
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'square';
-      osc.frequency.setValueAtTime(6500, time);
-      gain.gain.setValueAtTime(0.15, time);
-      gain.gain.exponentialRampToValueAtTime(0.001, time + 0.04);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(time);
-      osc.stop(time + 0.04);
-    }
-
-    function playTriggerSound(type) {
+    window.playTriggerSound = function(type) {
       initAudioContext();
       const now = audioCtx.currentTime;
-      if (type === 'kick') playSynthKick(now);
-      else if (type === 'snare') playSynthSnare(now);
-      else if (type === 'hihat') playSynthHiHat(now);
-      else if (type === 'cajon') {
-        playSynthKick(now);
-        playSynthSnare(now);
-      } else if (type === 'fill') {
-        // Instant drum fill burst
-        playSynthKick(now);
-        playSynthSnare(now);
-        setTimeout(() => playSynthSnare(audioCtx.currentTime), 90);
-        setTimeout(() => { playSynthKick(audioCtx.currentTime); playSynthHiHat(audioCtx.currentTime); }, 180);
+      const padEl = document.getElementById(`pad-${type}`);
+      if (padEl) {
+        padEl.classList.remove('pad-hit');
+        void padEl.offsetWidth;
+        padEl.classList.add('pad-hit');
       }
-    }
 
-    function triggerFillIn() {
+      if (type === 'kick') playAcousticKick(now, 1.05);
+      else if (type === 'snare') playAcousticSnare(now, 1.05);
+      else if (type === 'cajon_bass') playCajonBass(now, 1.05);
+      else if (type === 'tom') playAcousticTom(now, 1.05);
+      else if (type === 'floor') playAcousticFloorTom(now, 1.05);
+      else if (type === 'hihat') playAcousticHiHat(now, false, 1.05);
+      else if (type === 'crash') playAcousticCrash(now, 1.05);
+    };
+
+    window.triggerFillIn = function() {
       initAudioContext();
-      isFillInActive = true;
-      if (!isMetronomeRunning) {
-        playTriggerSound('fill');
+      const padEl = document.getElementById('pad-fill');
+      if (padEl) {
+        padEl.classList.remove('pad-hit');
+        void padEl.offsetWidth;
+        padEl.classList.add('pad-hit');
       }
+
+      if (isMetronomeRunning) {
+        isFillInActive = true;
+      } else {
+        playAcousticFill(audioCtx.currentTime);
+      }
+    };
+
+    // Keyboard Shortcuts when Stage Monitor is open
+    document.addEventListener('keydown', (e) => {
+      const monitor = document.getElementById('stage-monitor-screen');
+      const manageModal = document.getElementById('manage-songs-modal');
+      if (!monitor || monitor.classList.contains('hidden')) return;
+      if (manageModal && !manageModal.classList.contains('hidden')) return;
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        toggleMetronome();
+      } else if (e.key === 't' || e.key === 'T') {
+        e.preventDefault();
+        handleTapTempo();
+      } else if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        triggerFillIn();
+      }
+    });
+
+    // ================= VISITOR & STAGE MONITOR APP LOGIC =================
+    function showToast(message, icon = "✅") {
+      const toast = document.getElementById('toast-notif');
+      const textEl = document.getElementById('toast-text');
+      const iconEl = document.getElementById('toast-icon');
+      if (!toast || !textEl) return;
+
+      textEl.innerText = message;
+      if (iconEl) iconEl.innerText = icon;
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+
+      setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+      }, 3200);
     }
 
-    // App Navigation & Functions
     function renderSongs() {
       const container = document.getElementById('songs-container');
       if (!container) return;
@@ -757,22 +1675,47 @@
       const msgArea = document.getElementById('req-message');
       if (msgArea) {
         msgArea.value = `Kak, request lagu: "${title}" - ${artist}`;
+        msgArea.focus();
       }
     }
 
     function toggleQRIS() {
       const modal = document.getElementById('qris-modal');
-      if (modal) modal.classList.toggle('hidden');
+      if (modal) {
+        modal.classList.toggle('hidden');
+        modal.classList.toggle('flex');
+      }
+    }
+
+    // Secret 5-tap trigger on Kalajiva header logo/title
+    function handleSecretLogoTap() {
+      secretTapCount++;
+      clearTimeout(secretTapTimer);
+      if (secretTapCount >= 5) {
+        secretTapCount = 0;
+        showPasscodeModal();
+      } else {
+        secretTapTimer = setTimeout(() => {
+          secretTapCount = 0;
+        }, 1500);
+      }
     }
 
     function showPasscodeModal() {
       const modal = document.getElementById('passcode-modal');
-      if (modal) modal.classList.remove('hidden');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => document.getElementById('pin-input')?.focus(), 100);
+      }
     }
 
     function hidePasscodeModal() {
       const modal = document.getElementById('passcode-modal');
-      if (modal) modal.classList.add('hidden');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
       const err = document.getElementById('pin-error');
       if (err) err.classList.add('hidden');
       const pinInput = document.getElementById('pin-input');
@@ -781,19 +1724,23 @@
 
     function verifyPIN() {
       const val = (document.getElementById('pin-input')?.value || '').trim();
-      
-      // Validasi langsung string "1208" dan hash MD5
       const isMd5Match = typeof md5 === 'function' && md5(val) === STAGE_PIN_HASH;
       if (val === "1208" || isMd5Match) {
+        isStageAuthenticated = true;
         hidePasscodeModal();
         openStageMonitor();
       } else {
+        isStageAuthenticated = false;
         const err = document.getElementById('pin-error');
         if (err) err.classList.remove('hidden');
       }
     }
 
     function openStageMonitor() {
+      if (!isStageAuthenticated) {
+        showPasscodeModal();
+        return;
+      }
       const screen = document.getElementById('stage-monitor-screen');
       if (screen) {
         screen.classList.remove('hidden');
@@ -804,6 +1751,7 @@
     }
 
     function closeStageMonitor() {
+      isStageAuthenticated = false;
       const screen = document.getElementById('stage-monitor-screen');
       if (screen) {
         screen.classList.add('hidden');
@@ -816,6 +1764,7 @@
       const modal = document.getElementById('manage-songs-modal');
       if (!modal) return;
       modal.classList.toggle('hidden');
+      modal.classList.toggle('flex');
       if (!modal.classList.contains('hidden')) {
         renderManageSongsList();
       }
@@ -853,14 +1802,7 @@
 
       if (!title || !artist) return;
 
-      const newSong = {
-        id: Date.now(),
-        title,
-        artist,
-        category
-      };
-
-      songs.push(newSong);
+      songs.push({ id: Date.now(), title, artist, category });
       localStorage.setItem('kalajiva_custom_songs', JSON.stringify(songs));
 
       if (titleInput) titleInput.value = '';
@@ -868,6 +1810,7 @@
 
       renderSongs();
       renderManageSongsList();
+      showToast(`"${title}" ditambahkan ke songlist!`);
     }
 
     function deleteSong(id) {
@@ -881,33 +1824,40 @@
       const senderInput = document.getElementById('req-sender');
       const messageInput = document.getElementById('req-message');
 
-      const sender = senderInput?.value.trim() || 'Anonim';
+      const sender = senderInput?.value.trim() || 'Pengunjung';
       const text = messageInput?.value.trim();
 
-      if (!text) return;
+      if (!text) {
+        showToast('Tulis pesan atau judul lagu dulu ya!', '⚠️');
+        return;
+      }
 
       const newReq = {
-        id: Date.now(),
         sender,
         text,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        createdAt: Date.now()
+      };
+
+      const saveLocalFallback = () => {
+        window.allLiveRequests.unshift({ id: Date.now().toString(), ...newReq });
+        localStorage.setItem('kalajiva_local_requests', JSON.stringify(window.allLiveRequests));
+        renderStageFeed();
       };
 
       if (window.FirebaseDB && window.collection && window.addDoc) {
-        const path = `artifacts/${window.FirebaseAppId}/requests`;
-        window.addDoc(window.collection(window.FirebaseDB, path), newReq).catch(err => {
-          console.warn("Firestore error fallback to local state:", err);
-          window.allLiveRequests.unshift(newReq);
-          renderStageFeed();
+        const path = `artifacts/${window.FirebaseAppId}/public/data/requests`;
+        window.addDoc(window.collection(window.FirebaseDB, path), newReq).catch(() => {
+          saveLocalFallback();
         });
       } else {
-        window.allLiveRequests.unshift(newReq);
-        renderStageFeed();
+        saveLocalFallback();
       }
 
       if (senderInput) senderInput.value = '';
       if (messageInput) messageInput.value = '';
 
+      showToast('Request berhasil masuk ke monitor panggung!', '📺');
       switchTab('songlist');
     }
 
@@ -915,35 +1865,71 @@
       const senderInput = document.getElementById('req-sender');
       const messageInput = document.getElementById('req-message');
 
-      const sender = senderInput?.value.trim() || 'Anonim';
+      const sender = senderInput?.value.trim() || 'Pengunjung';
       const text = messageInput?.value.trim();
 
       if (!text) {
-        alert('Silakan tulis pesan atau request lagu terlebih dahulu.');
+        showToast('Silakan tulis pesan atau request lagu terlebih dahulu.', '⚠️');
         return;
       }
 
       const phoneNumber = "62895339899333";
       const formattedText = `Halo Kalajiva! 👋%0A%0A*Dari:* ${encodeURIComponent(sender)}%0A*Pesan / Request:* %0A${encodeURIComponent(text)}`;
-      const waUrl = `https://wa.me/${phoneNumber}?text=${formattedText}`;
-
-      window.open(waUrl, '_blank');
+      window.open(`https://wa.me/${phoneNumber}?text=${formattedText}`, '_blank');
     }
 
+    window.markRequestDone = function(docId) {
+      if (window.FirebaseDB && window.deleteDoc && window.doc && docId !== 'welcome-msg') {
+        const path = `artifacts/${window.FirebaseAppId}/public/data/requests`;
+        window.deleteDoc(window.doc(window.FirebaseDB, path, docId)).catch(() => {});
+      }
+      window.allLiveRequests = window.allLiveRequests.filter(r => r.id !== docId);
+      localStorage.setItem('kalajiva_local_requests', JSON.stringify(window.allLiveRequests));
+      renderStageFeed();
+    };
+
+    window.toggleRequestFeedPanel = function() {
+      const feed = document.getElementById('stage-messages-feed');
+      const btn = document.getElementById('toggle-feed-btn');
+      if (!feed || !btn) return;
+      feed.classList.toggle('hidden');
+      btn.innerText = feed.classList.contains('hidden') ? 'Tampilkan' : 'Sembunyikan';
+    };
+
+    // Render live visitor requests in Stage Monitor (newest first)
     function renderStageFeed() {
       const container = document.getElementById('stage-messages-feed');
+      const counter = document.getElementById('request-counter');
       if (!container) return;
       container.innerHTML = '';
 
-      window.allLiveRequests.forEach(req => {
+      const sorted = [...window.allLiveRequests].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      if (counter) counter.innerText = `${sorted.length} Pesan`;
+
+      if (sorted.length === 0) {
+        container.innerHTML = `<p class="text-center text-xs text-stone-500 py-8 border border-dashed border-stone-800 rounded-xl">Belum ada request atau pesan masuk dari pengunjung.</p>`;
+        return;
+      }
+
+      sorted.forEach((req, idx) => {
         const card = document.createElement('div');
-        card.className = 'bg-stone-900 border border-stone-800 rounded-xl p-3.5 shadow-md';
+        card.className = `border rounded-xl p-3.5 shadow-md flex justify-between items-start gap-3 ${
+          idx === 0
+            ? 'bg-amber-950/30 border-amber-500/60'
+            : 'bg-stone-900 border-stone-800'
+        }`;
         card.innerHTML = `
-          <div class="flex justify-between items-center mb-1">
-            <span class="font-bold text-amber-400 text-xs">${req.sender}</span>
-            <span class="text-[10px] text-stone-500">${req.time}</span>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="font-bold text-amber-400 text-xs">${req.sender}</span>
+              ${idx === 0 ? '<span class="text-[9px] bg-amber-500 text-stone-950 font-black px-1.5 py-0.2 rounded">BARU</span>' : ''}
+              <span class="text-[10px] text-stone-500">${req.time}</span>
+            </div>
+            <p class="text-sm text-stone-100 font-medium leading-relaxed">${req.text}</p>
           </div>
-          <p class="text-sm text-stone-200 font-medium">${req.text}</p>
+          <button onclick="markRequestDone('${req.id}')" class="px-2.5 py-1.5 rounded-lg bg-emerald-900/50 hover:bg-emerald-700 text-emerald-200 text-[10px] font-bold border border-emerald-700/50 shrink-0 transition">
+            ✓ Selesai
+          </button>
         `;
         container.appendChild(card);
       });
@@ -951,29 +1937,46 @@
 
     window.listenToRequests = function() {
       if (!window.FirebaseDB || !window.collection || !window.onSnapshot) return;
-      const path = `artifacts/${window.FirebaseAppId}/requests`;
+      const path = `artifacts/${window.FirebaseAppId}/public/data/requests`;
       try {
-        window.onSnapshot(window.collection(window.FirebaseDB, path), (snapshot) => {
-          const list = [];
-          snapshot.forEach(doc => {
-            list.push({ id: doc.id, ...doc.data() });
-          });
-          if (list.length > 0) {
-            window.allLiveRequests = [...list, ...mockMessages];
+        window.onSnapshot(
+          window.collection(window.FirebaseDB, path),
+          (snapshot) => {
+            const list = [];
+            snapshot.forEach(docSnap => {
+              list.push({ id: docSnap.id, ...docSnap.data() });
+            });
+            window.allLiveRequests = list.length > 0 ? list : [...mockMessages];
             renderStageFeed();
+          },
+          (error) => {
+            console.warn("Firestore permission restricted, using local storage fallback:", error.code);
+            const localSaved = JSON.parse(localStorage.getItem('kalajiva_local_requests') || 'null');
+            if (localSaved && localSaved.length > 0) {
+              window.allLiveRequests = localSaved;
+              renderStageFeed();
+            }
           }
-        }, (error) => {
-          console.warn("Firestore permission issue, fallback to local state:", error);
-        });
+        );
       } catch (err) {
-        console.warn("Firestore error:", err);
+        console.warn("Firestore listener error:", err);
       }
     };
 
     window.onload = function() {
+      const localSaved = JSON.parse(localStorage.getItem('kalajiva_local_requests') || 'null');
+      if (localSaved && localSaved.length > 0) {
+        window.allLiveRequests = localSaved;
+      }
       renderSongs();
       build16StepGrid();
       renderStageFeed();
+
+      // Auto-prompt Stage Monitor if opened via private stage URL (?stage=1 or #monitor)
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('stage') === '1' || window.location.hash === '#monitor') {
+        showPasscodeModal();
+      }
     };
   </script>
 </body>
